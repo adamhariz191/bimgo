@@ -688,14 +688,32 @@ function renderLessonView() {
   document.getElementById("vid-sign-name").textContent=sign;
   document.getElementById("t-les-link").href=signBankUrl(sign);
   
-  // --- NEW MEDIA LOOKUP ---
-  // If no video is found in the dictionary, it defaults to a W3Schools placeholder
+  // --- FIXED MEDIA LOOKUP ---
   const videoUrl = SIGN_MEDIA[sign] || "https://www.w3schools.com/html/mov_bbb.mp4"; 
   const vidPlayer = document.getElementById("lesson-vid");
   
+  // 1. Force the player to be muted in JS (Required by iOS Safari & Android Chrome)
+  vidPlayer.removeAttribute("src"); 
+  vidPlayer.muted = true;
+  vidPlayer.playsInline = true;
   vidPlayer.src = videoUrl;
-  vidPlayer.play().catch(e => console.log("Auto-play prevented by browser."));
   
+  // 2. Force the player to reload the new video file structure
+  vidPlayer.load();
+  
+  // 3. Play with a slight fallback delay if the browser tries to block it
+  var playPromise = vidPlayer.play();
+  if (playPromise !== undefined) {
+      playPromise.catch(error => {
+          console.log("Auto-play prevented. Adding backup interaction click listener.");
+          // Fallback: Play as soon as the user interacts with the screen anywhere
+          document.body.addEventListener('click', () => {
+              vidPlayer.play();
+          }, { once: true });
+      });
+  }
+  // ------------------------------------
+
   showScreen("s-lesson");
 }
 
