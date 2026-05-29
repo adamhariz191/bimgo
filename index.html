@@ -87,7 +87,6 @@
   .gif-container { background: #111; border: 1px solid #374151; border-radius: 20px; padding: 20px; margin-bottom: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
   .lesson-gif-img { width: 100%; max-width: 280px; border-radius: 12px; object-fit: cover; }
 
-  /* MCQ QUIZ GRID */
   .quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
   .quiz-btn { padding: 20px 10px; font-size: 18px; font-weight: 900; border-radius: 16px; border: 2px solid #374151; background: #1f2937; color: #fff; cursor: pointer; transition: all 0.2s; text-align: center; }
   .quiz-btn:active { transform: scale(0.95); }
@@ -346,7 +345,6 @@
 </div> 
 
 <script>
-// --- I18N DICTIONARY WITH QUIZ TRANSLATIONS ---
 const i18n = {
   ms: {
     splash_sub: "Selamat datang ke Bimgo", auth_title: "Selamat Datang", auth_sub: "Belajar Bahasa Isyarat Malaysia dengan AI.",
@@ -431,7 +429,6 @@ const CHAPTERS = [
   }
 ];
 
-// --- SMART MEDIA DICTIONARY (MATCHED TO UPLOADED ASSETS) ---
 const SIGN_MEDIA = {
     "A": "./assets/A.mp4",
     "B": "./assets/B.mp4",
@@ -456,10 +453,11 @@ let activeSessionEmail = gs("bimgo_session", null);
 let progress = {}; 
 let profile=null, tempSignupEmail="", tempSignupPass="", setupStep=0, setupData={username:"", avatar:"🦁", goal:10, lang:'ms'}, editTempAvatar = "", editTempLang = "ms"; 
 let currentChapter=null, currentLevel=null, currentSignIdx=0, allLessonSigns=[], profileTab="stats";
+
 let mpHands = null, mpCamera = null, isCameraRunning = false, currentScore = 0;
 let sessionAccuracies = [];
+let wristHistory = []; // Tracks hand movement history
 
-// NEW QUIZ AND TIMER STATE VARIABLES
 let quizQuestions = [];
 let currentQuizIdx = 0;
 let quizScore = 0;
@@ -470,43 +468,30 @@ let learningInterval = null;
 function gs(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
 function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
 function showNotif(msg){ const el=document.getElementById("notif"); el.textContent=msg; el.style.display="block"; setTimeout(()=>el.style.display="none",2500); }
-
 function t(key) { const l = profile ? (profile.lang || 'ms') : setupData.lang; return i18n[l][key] || key; }
 
 function applyLanguageStrings() {
     document.getElementById('t-splash-sub').textContent = t('splash_sub'); document.getElementById('t-wb-title').textContent = t('wb_title'); document.getElementById('t-auth-title').textContent = t('auth_title'); document.getElementById('t-auth-sub').textContent = t('auth_sub'); document.getElementById('t-auth-g-text').textContent = t('auth_g_text'); document.getElementById('t-auth-a-text').textContent = t('auth_a_text'); document.getElementById('t-auth-or').textContent = t('auth_or'); document.getElementById('t-auth-email-btn').innerHTML = t('auth_email_btn'); document.getElementById('t-email-hub-title').textContent = t('email_hub_title'); document.getElementById('t-auth-reg').textContent = t('auth_reg'); document.getElementById('t-auth-log').textContent = t('auth_log'); document.getElementById('t-reg-title').textContent = t('reg_title'); document.getElementById('t-reg-lbl1').textContent = t('lbl_email'); document.getElementById('t-reg-lbl2').textContent = t('lbl_pass'); document.getElementById('t-reg-lbl3').textContent = t('lbl_pass2'); document.getElementById('t-reg-btn').textContent = t('btn_next'); document.getElementById('t-log-title').textContent = t('log_title'); document.getElementById('t-log-lbl1').textContent = t('lbl_email'); document.getElementById('t-log-lbl2').textContent = t('lbl_pass'); document.getElementById('t-log-btn').textContent = t('auth_log'); document.getElementById('t-home-welcome').textContent = t('home_welcome'); document.getElementById('t-home-target').textContent = t('home_target'); document.getElementById('t-home-ch-title').textContent = t('home_ch_title'); document.getElementById('t-nav-home').textContent = t('nav_home'); document.getElementById('t-nav-prof').textContent = t('nav_prof'); document.getElementById('t-prof-title').textContent = t('prof_title'); document.getElementById('t-prof-edit-btn').textContent = t('prof_edit_btn'); document.getElementById('t-tab-stat').textContent = t('tab_stat'); document.getElementById('t-tab-badge').textContent = t('tab_badge'); document.getElementById('t-tab-rank').textContent = t('tab_rank'); document.getElementById('t-prof-logout').textContent = t('prof_logout'); document.getElementById('t-edit-title').textContent = t('edit_title'); document.getElementById('t-edit-lbl1').textContent = t('edit_lbl1'); document.getElementById('t-edit-lbl2').textContent = t('edit_lbl2'); document.getElementById('t-edit-lbl3').textContent = t('edit_lbl3'); document.getElementById('t-edit-btn').textContent = t('edit_save'); document.getElementById('t-les-theory').textContent = t('les_theory'); document.getElementById('t-les-watch').textContent = t('les_watch'); document.getElementById('t-les-visual').textContent = t('les_visual'); document.getElementById('t-les-link').innerHTML = `🔗 ${t('les_link')}`; document.getElementById('t-les-cam').textContent = t('les_cam'); document.getElementById('t-cam-title').textContent = t('cam_title'); document.getElementById('t-cam-show').textContent = t('cam_show'); document.getElementById('t-cam-acc').textContent = t('cam_acc'); document.getElementById('cam-start-btn').textContent = t('cam_open'); document.getElementById('cam-submit-btn').textContent = t('cam_submit'); document.getElementById('cam-status').textContent = t('cam_load'); document.getElementById('cam-success-msg').textContent = t('cam_ready'); document.getElementById('t-res-acc').textContent = t('res_acc');
-    
-    document.getElementById('t-quiz-title').textContent = t('quiz_title');
-    document.getElementById('t-quiz-q').textContent = t('quiz_q');
+    document.getElementById('t-quiz-title').textContent = t('quiz_title'); document.getElementById('t-quiz-q').textContent = t('quiz_q');
 }
 
 function showScreen(id){ 
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); 
   document.getElementById(id).classList.add("active"); 
   
-  // --- STRICT LEARNING TRACKER ---
   const isLearningScreen = (id === 's-lesson' || id === 's-camera' || id === 's-quiz');
   if (isLearningScreen && !learningInterval) {
       learningInterval = setInterval(() => {
-          if (profile) {
-              profile.timeSpent = (profile.timeSpent || 0) + 1;
-              if(profile.timeSpent % 5 === 0) {
-                  mockDB[profile.email] = profile; 
-                  ss("bimgo_users", mockDB);
-              }
-          }
+          if (profile) { profile.timeSpent = (profile.timeSpent || 0) + 1; if(profile.timeSpent % 5 === 0) { mockDB[profile.email] = profile; ss("bimgo_users", mockDB); } }
       }, 1000);
   } else if (!isLearningScreen && learningInterval) {
-      clearInterval(learningInterval);
-      learningInterval = null;
+      clearInterval(learningInterval); learningInterval = null;
       if (profile) { mockDB[profile.email] = profile; ss("bimgo_users", mockDB); }
   }
-  // ------------------------------------
 
   const nav = document.getElementById("main-nav");
   if(id === "s-home" || id === "s-profile" || id === "s-chapter") {
-      nav.style.display = "flex";
-      document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+      nav.style.display = "flex"; document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
       if(id === "s-home" || id === "s-chapter") document.getElementById("nav-home").classList.add("active");
       if(id === "s-profile") document.getElementById("nav-profile").classList.add("active");
   } else { nav.style.display = "none"; }
@@ -522,8 +507,7 @@ function handleSocialAuth(provider) {
     const btnId = provider === 'google' ? 't-auth-google' : 't-auth-apple'; const textId = provider === 'google' ? 't-auth-g-text' : 't-auth-a-text'; const btn = document.getElementById(btnId); const textSpan = document.getElementById(textId); const originalText = textSpan.innerHTML;
     textSpan.innerHTML = `⏳ ${t('auth_loading')}`; btn.disabled = true;
     setTimeout(() => { textSpan.innerHTML = originalText; btn.disabled = false; const email = `${provider}_user@mock.com`;
-        if(mockDB[email]) { activeSessionEmail = email; profile = mockDB[email]; progress = profile.progress || {}; applyLanguageStrings(); ss("bimgo_session", email); showWelcomeBack();
-        } else { tempSignupEmail = email; tempSignupPass = 'oauth_mock_password'; setupStep = 0; renderSetup(); showScreen("s-setup"); }
+        if(mockDB[email]) { activeSessionEmail = email; profile = mockDB[email]; progress = profile.progress || {}; applyLanguageStrings(); ss("bimgo_session", email); showWelcomeBack(); } else { tempSignupEmail = email; tempSignupPass = 'oauth_mock_password'; setupStep = 0; renderSetup(); showScreen("s-setup"); }
     }, 1500);
 }
 
@@ -535,37 +519,17 @@ function renderSetup(){ const c=document.getElementById("setup-content"); const 
 function setupNext(){ if(setupStep===0 && !setupData.username) return showNotif(t('err_req')); if(setupStep<2){setupStep++; renderSetup(); return;} profile = {...setupData, email: tempSignupEmail, password: tempSignupPass, xp:0, streak:1, progress: {}}; progress = profile.progress; mockDB[tempSignupEmail] = profile; ss("bimgo_users", mockDB); activeSessionEmail = tempSignupEmail; ss("bimgo_session", activeSessionEmail); applyLanguageStrings(); showScreen("s-home"); }
 
 function renderHome(){
-  document.getElementById("home-greeting").textContent=`${profile.avatar} ${profile.username}`; 
-  document.getElementById("home-xp").textContent=profile.xp||0; 
-  document.getElementById("home-streak").textContent=profile.streak||1; 
-  
-  // --- LIVE TIME GOAL CALCULATION ---
-  const spentSecs = profile.timeSpent || 0;
-  const goalSecs = (profile.goal || 10) * 60;
-  let mins = Math.floor(spentSecs / 60);
-  let secs = spentSecs % 60;
-  let pct = Math.min((spentSecs / goalSecs) * 100, 100);
-  
-  let displaySecs = secs < 10 ? "0" + secs : secs;
-  
-  document.getElementById("home-goal-label").textContent=`${mins}m ${displaySecs}s / ${profile.goal}m`;
-  document.querySelector("#s-home .progress-fill").style.width = `${pct}%`;
-  // ---------------------------------------
-
-  document.getElementById("chapter-grid").innerHTML=CHAPTERS.map((ch,i)=>{
-    const done=ch.levels.filter(l=>progress[l.id]?.completed).length; const pct=Math.round((done/ch.levels.length)*100);
-    return `<button class="chapter-card" onclick="openChapter(${i})" style="border-color:${ch.color}44;background:${ch.color}18"><div style="font-size:36px;margin-bottom:12px">${ch.icon}</div><div style="font-size:16px;font-weight:900;color:#ffffff;">${t(ch.dictKey)}</div><div style="font-size:12px;color:#9ca3af;margin-bottom:12px">${ch.subtitle}</div><div class="progress-bar"><div class="progress-fill" style="background:${ch.color};width:${pct}%"></div></div></button>`;
-  }).join("");
+  document.getElementById("home-greeting").textContent=`${profile.avatar} ${profile.username}`; document.getElementById("home-xp").textContent=profile.xp||0; document.getElementById("home-streak").textContent=profile.streak||1; 
+  const spentSecs = profile.timeSpent || 0; const goalSecs = (profile.goal || 10) * 60; let mins = Math.floor(spentSecs / 60); let secs = spentSecs % 60; let pct = Math.min((spentSecs / goalSecs) * 100, 100); let displaySecs = secs < 10 ? "0" + secs : secs;
+  document.getElementById("home-goal-label").textContent=`${mins}m ${displaySecs}s / ${profile.goal}m`; document.querySelector("#s-home .progress-fill").style.width = `${pct}%`;
+  document.getElementById("chapter-grid").innerHTML=CHAPTERS.map((ch,i)=>{ const done=ch.levels.filter(l=>progress[l.id]?.completed).length; const pct=Math.round((done/ch.levels.length)*100); return `<button class="chapter-card" onclick="openChapter(${i})" style="border-color:${ch.color}44;background:${ch.color}18"><div style="font-size:36px;margin-bottom:12px">${ch.icon}</div><div style="font-size:16px;font-weight:900;color:#ffffff;">${t(ch.dictKey)}</div><div style="font-size:12px;color:#9ca3af;margin-bottom:12px">${ch.subtitle}</div><div class="progress-bar"><div class="progress-fill" style="background:${ch.color};width:${pct}%"></div></div></button>`; }).join("");
 }
 
 function openChapter(ci){
   currentChapter=CHAPTERS[ci]; document.getElementById("ch-title").textContent=t(currentChapter.dictKey); document.getElementById("ch-icon").textContent=currentChapter.icon;
   document.getElementById("level-list").innerHTML=currentChapter.levels.map((lv,li)=>{
     const done = progress[lv.id]?.completed; const unlocked = li===0 || progress[currentChapter.levels[li-1].id]?.completed;
-    
-    let levelIcon = lv.isQuiz ? "📝" : (done ? "✅" : li+1);
-    let levelTitle = lv.isQuiz ? t('quiz_title') : lv.title;
-
+    let levelIcon = lv.isQuiz ? "📝" : (done ? "✅" : li+1); let levelTitle = lv.isQuiz ? t('quiz_title') : lv.title;
     return `<div class="level-item ${unlocked? done?'done':'':'locked'}" onclick="${unlocked? `startLevel(${li})`:''}"><div style="width:48px;height:48px;border-radius:16px;background:${done?currentChapter.color:unlocked?"#374151":"#1f2937"};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;">${levelIcon}</div><div style="flex:1; font-weight:900; font-size:16px; color:#fff;">${levelTitle}</div>${unlocked && !done ? '<div style="color:#6b7280; font-size:20px;">▶</div>' : ''}</div>`;
   }).join("");
   showScreen("s-chapter");
@@ -573,122 +537,48 @@ function openChapter(ci){
 
 function startLevel(li){ 
     currentLevel=currentChapter.levels[li]; 
-    
-    if (currentLevel.isQuiz) {
-        startQuiz();
-    } else {
-        currentSignIdx=0; 
-        allLessonSigns=[...currentLevel.signs]; 
-        sessionAccuracies = []; 
-        renderLessonView(); 
-    }
+    if (currentLevel.isQuiz) startQuiz();
+    else { currentSignIdx=0; allLessonSigns=[...currentLevel.signs]; sessionAccuracies = []; renderLessonView(); }
 }
 
 function startQuiz() {
-    quizScore = 0;
-    currentQuizIdx = 0;
-    
-    let allChapterSigns = [];
-    currentChapter.levels.forEach(l => {
-        if (!l.isQuiz) allChapterSigns.push(...l.signs);
-    });
-
+    quizScore = 0; currentQuizIdx = 0; let allChapterSigns = [];
+    currentChapter.levels.forEach(l => { if (!l.isQuiz) allChapterSigns.push(...l.signs); });
     quizQuestions = [];
     for(let i = 0; i < 8; i++) {
-        let correctSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)];
-        let options = [correctSign];
-        
-        while(options.length < 4) {
-            let wrongSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)];
-            if(!options.includes(wrongSign)) options.push(wrongSign);
-        }
-        
-        options.sort(() => Math.random() - 0.5);
-        quizQuestions.push({ correct: correctSign, options: options });
+        let correctSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)]; let options = [correctSign];
+        while(options.length < 4) { let wrongSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)]; if(!options.includes(wrongSign)) options.push(wrongSign); }
+        options.sort(() => Math.random() - 0.5); quizQuestions.push({ correct: correctSign, options: options });
     }
-    
-    renderQuizQuestion();
-    showScreen('s-quiz');
+    renderQuizQuestion(); showScreen('s-quiz');
 }
 
 function renderQuizQuestion() {
-    let q = quizQuestions[currentQuizIdx];
-    document.getElementById('quiz-progress-text').textContent = `${currentQuizIdx + 1}/8`;
+    let q = quizQuestions[currentQuizIdx]; document.getElementById('quiz-progress-text').textContent = `${currentQuizIdx + 1}/8`;
     document.getElementById('quiz-gif').src = `https://via.placeholder.com/400x300/111c11/4CAF50?text=Sign:+` + encodeURIComponent(q.correct);
-    
     let grid = document.getElementById('quiz-options');
-    grid.innerHTML = q.options.map(opt => 
-        `<button class="quiz-btn" onclick="handleQuizAnswer(this, '${opt}', '${q.correct}')">${opt}</button>`
-    ).join('');
+    grid.innerHTML = q.options.map(opt => `<button class="quiz-btn" onclick="handleQuizAnswer(this, '${opt}', '${q.correct}')">${opt}</button>`).join('');
 }
 
 function handleQuizAnswer(btn, selected, correct) {
     document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
-    
-    if (selected === correct) {
-        btn.style.background = "#4CAF50";
-        btn.style.borderColor = "#4CAF50";
-        quizScore++;
-    } else {
-        btn.style.background = "#F44336";
-        btn.style.borderColor = "#F44336";
-        document.querySelectorAll('.quiz-btn').forEach(b => {
-            if(b.textContent === correct) {
-                b.style.background = "#4CAF50";
-                b.style.borderColor = "#4CAF50";
-            }
-        });
-    }
-    
-    setTimeout(() => {
-        currentQuizIdx++;
-        if(currentQuizIdx < 8) {
-            renderQuizQuestion();
-        } else {
-            finishQuiz();
-        }
-    }, 1200);
+    if (selected === correct) { btn.style.background = "#4CAF50"; btn.style.borderColor = "#4CAF50"; quizScore++; } 
+    else { btn.style.background = "#F44336"; btn.style.borderColor = "#F44336"; document.querySelectorAll('.quiz-btn').forEach(b => { if(b.textContent === correct) { b.style.background = "#4CAF50"; b.style.borderColor = "#4CAF50"; } }); }
+    setTimeout(() => { currentQuizIdx++; if(currentQuizIdx < 8) { renderQuizQuestion(); } else { finishQuiz(); } }, 1200);
 }
 
 function finishQuiz() {
     const isSuccess = quizScore >= 6;
-    const resIcon = document.getElementById("res-icon"); 
-    const resTitle = document.getElementById("res-title"); 
-    const resSub = document.getElementById("res-sub"); 
-    const retryBtn = document.getElementById("res-retry-btn"); 
-    const nextBtn = document.getElementById("res-next-btn");
-    const statsBox = document.getElementById("res-stats-box");
-
+    const resIcon = document.getElementById("res-icon"); const resTitle = document.getElementById("res-title"); const resSub = document.getElementById("res-sub"); const retryBtn = document.getElementById("res-retry-btn"); const nextBtn = document.getElementById("res-next-btn"); const statsBox = document.getElementById("res-stats-box");
     if (isSuccess) {
-        resIcon.textContent = "🏅"; 
-        resTitle.textContent = t('quiz_pass'); 
-        resTitle.style.color = "#4CAF50"; 
-        resSub.textContent = `${quizScore}/8 - Lulus!`;
-        
-        retryBtn.style.display = "none"; 
-        nextBtn.style.display = "block";
-        nextBtn.textContent = t('res_home');
-        nextBtn.onclick = () => showScreen('s-home');
-        
-        document.getElementById("res-xp-val").textContent = currentLevel.xp;
-        document.getElementById("t-res-acc").textContent = t('quiz_score');
-        document.getElementById("res-acc-val").textContent = Math.round((quizScore/8)*100);
+        resIcon.textContent = "🏅"; resTitle.textContent = t('quiz_pass'); resTitle.style.color = "#4CAF50"; resSub.textContent = `${quizScore}/8 - Lulus!`;
+        retryBtn.style.display = "none"; nextBtn.style.display = "block"; nextBtn.textContent = t('res_home'); nextBtn.onclick = () => showScreen('s-home');
+        document.getElementById("res-xp-val").textContent = currentLevel.xp; document.getElementById("t-res-acc").textContent = t('quiz_score'); document.getElementById("res-acc-val").textContent = Math.round((quizScore/8)*100);
         statsBox.style.display = "flex"; 
-
-        progress[currentLevel.id] = {completed:true}; profile.progress = progress; profile.xp = (profile.xp || 0) + currentLevel.xp; 
-        mockDB[profile.email] = profile; ss("bimgo_users", mockDB);
+        progress[currentLevel.id] = {completed:true}; profile.progress = progress; profile.xp = (profile.xp || 0) + currentLevel.xp; mockDB[profile.email] = profile; ss("bimgo_users", mockDB);
     } else {
-        resIcon.textContent = "💔"; 
-        resTitle.textContent = t('quiz_fail'); 
-        resTitle.style.color = "#F44336"; 
-        resSub.textContent = `${quizScore}/8. ${t('quiz_req')}`;
-        
-        retryBtn.style.display = "block"; 
-        nextBtn.style.display = "none";
-        
-        retryBtn.textContent = t('res_retrybtn');
-        retryBtn.onclick = () => startQuiz(); 
-        statsBox.style.display = "none";
+        resIcon.textContent = "💔"; resTitle.textContent = t('quiz_fail'); resTitle.style.color = "#F44336"; resSub.textContent = `${quizScore}/8. ${t('quiz_req')}`;
+        retryBtn.style.display = "block"; nextBtn.style.display = "none"; retryBtn.textContent = t('res_retrybtn'); retryBtn.onclick = () => startQuiz(); statsBox.style.display = "none";
     }
     showScreen("s-result");
 }
@@ -700,47 +590,19 @@ function renderLessonView() {
   document.getElementById("vid-sign-name").textContent=sign;
   document.getElementById("t-les-link").href=signBankUrl(sign);
   
-  // --- SMART MEDIA LOOKUP ---
   const mediaUrl = SIGN_MEDIA[sign] || "https://via.placeholder.com/400x300/111c11/4CAF50?text=Tiada+Media"; 
   const vidPlayer = document.getElementById("lesson-vid");
   const imgPlayer = document.getElementById("lesson-img");
   
-  // Check if the file is a video (.mp4 or .webm)
   if (mediaUrl.toLowerCase().endsWith(".mp4") || mediaUrl.toLowerCase().endsWith(".webm")) {
-      // Hide Image, Show Video
-      imgPlayer.style.display = "none";
-      vidPlayer.style.display = "block";
-      
-      // 1. Force the player to be muted in JS (Required by iOS Safari & Android Chrome)
-      vidPlayer.removeAttribute("src"); 
-      vidPlayer.muted = true;
-      vidPlayer.playsInline = true;
-      vidPlayer.src = mediaUrl;
-      
-      // 2. Force the player to reload the new video file structure
-      vidPlayer.load();
-      
-      // 3. Play with a slight fallback delay if the browser tries to block it
+      imgPlayer.style.display = "none"; vidPlayer.style.display = "block";
+      vidPlayer.removeAttribute("src"); vidPlayer.muted = true; vidPlayer.playsInline = true; vidPlayer.src = mediaUrl; vidPlayer.load();
       var playPromise = vidPlayer.play();
-      if (playPromise !== undefined) {
-          playPromise.catch(error => {
-              console.log("Auto-play prevented. Adding backup interaction click listener.");
-              // Fallback: Play as soon as the user interacts with the screen anywhere
-              document.body.addEventListener('click', () => {
-                  vidPlayer.play();
-              }, { once: true });
-          });
-      }
+      if (playPromise !== undefined) { playPromise.catch(error => { document.body.addEventListener('click', () => { vidPlayer.play(); }, { once: true }); }); }
   } else {
-      // It is a Picture (.png, .jpg, .gif) -> Hide Video, Show Image
-      vidPlayer.style.display = "none";
-      vidPlayer.pause(); 
-      
-      imgPlayer.style.display = "block";
-      imgPlayer.src = mediaUrl;
+      vidPlayer.style.display = "none"; vidPlayer.pause(); 
+      imgPlayer.style.display = "block"; imgPlayer.src = mediaUrl;
   }
-  // ------------------------------------
-
   showScreen("s-lesson");
 }
 
@@ -753,6 +615,7 @@ function openCameraChallenge(){
   document.getElementById("cam-success-msg").style.display = "none";
   
   if (holdInterval) { clearInterval(holdInterval); holdInterval = null; }
+  wristHistory = []; // CLEAR MEMORY
   
   updateAccUI(0); 
   showScreen("s-camera");
@@ -760,7 +623,6 @@ function openCameraChallenge(){
 
 async function startMediaPipeCam() {
   document.getElementById("cam-start-btn").style.display = "none"; 
-  const submitBtn = document.getElementById("cam-submit-btn"); submitBtn.style.display = "none"; 
   const msgBox = document.getElementById("cam-success-msg"); msgBox.style.display = "block"; msgBox.style.background = "transparent"; msgBox.style.borderColor = "#374151"; msgBox.style.color = "#9ca3af"; msgBox.textContent = t('cam_ready');
   document.getElementById("cam-status").textContent = t('cam_load');
   
@@ -773,14 +635,8 @@ async function startMediaPipeCam() {
 }
 
 function stopCam() { 
-    if(mpCamera && isCameraRunning) { 
-        mpCamera.stop(); 
-        isCameraRunning = false; 
-    } 
-    if (holdInterval) { 
-        clearInterval(holdInterval); 
-        holdInterval = null; 
-    }
+    if(mpCamera && isCameraRunning) { mpCamera.stop(); isCameraRunning = false; } 
+    if (holdInterval) { clearTimeout(holdInterval); clearInterval(holdInterval); holdInterval = null; } 
 }
 
 function onMediaPipeResult(results, ctx, canvas) {
@@ -788,6 +644,11 @@ function onMediaPipeResult(results, ctx, canvas) {
   if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
     const lm = results.multiHandLandmarks[0]; 
     drawConnectors(ctx, lm, HAND_CONNECTIONS, {color: '#4CAF50', lineWidth: 4}); drawLandmarks(ctx, lm, {color: '#fbbf24', lineWidth: 2, radius: 4});
+    
+    // TRACK WRIST POSITION
+    wristHistory.push({ x: lm[0].x, y: lm[0].y });
+    if (wristHistory.length > 30) wristHistory.shift();
+
     let score = getGestureScore(document.getElementById("cam-target-sign").textContent, lm); updateAccUI(score);
   } else { updateAccUI(0); }
   ctx.restore();
@@ -797,9 +658,25 @@ function getGestureScore(sign, lm) {
   const isUp = (tip, pip) => lm[tip].y < lm[pip].y;
   const idxUp = isUp(8, 6); const midUp = isUp(12, 10); const rngUp = isUp(16, 14); const pnkUp = isUp(20, 18);
   let s = 0;
-  if (sign.length > 1) { return Math.random() * 100; }
+  if (sign.length > 1 && sign !== "Hello") { return Math.random() * 100; }
 
   switch(sign) {
+    case "Hello": 
+      // Static Rule: Hand Open
+      if(idxUp) s += 15; if(midUp) s += 15; if(rngUp) s += 15; if(pnkUp) s += 15; 
+      
+      // Dynamic Rule: Did the wrist wave side-to-side?
+      if (wristHistory.length > 10) {
+          let minX = 1, maxX = 0;
+          for (let pos of wristHistory) {
+              if (pos.x < minX) minX = pos.x;
+              if (pos.x > maxX) maxX = pos.x;
+          }
+          let deltaX = maxX - minX; 
+          if (deltaX > 0.04) s += 20; // Small wave
+          if (deltaX > 0.08) s += 20; // Full wave
+      }
+      break;
     case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
     case "B": if(idxUp) s+=20; if(midUp) s+=20; if(rngUp) s+=20; if(pnkUp) s+=20; if(lm[4].x > Math.min(lm[5].x, lm[17].x) && lm[4].x < Math.max(lm[5].x, lm[17].x)) s+=20; break;
     case "C": if(!idxUp && !midUp) s+=50; if(lm[4].x < lm[5].x) s+=50; break; 
@@ -847,29 +724,46 @@ function updateAccUI(score) {
         label.style.color = "#4CAF50"; 
         submitBtn.style.display = "none"; 
         
-        // --- 3 SECOND COUNTDOWN ---
-        if (!holdInterval) {
-            holdTimer = 3;
+        // --- SMART SUBMIT LOGIC ---
+        if (currentChapter && currentChapter.id > 1) {
+            // DYNAMIC SIGNS: INSTANT SUBMIT
             msgBox.style.background = "#0d2a0d"; 
             msgBox.style.borderColor = "#4CAF50"; 
             msgBox.style.color = "#81c784"; 
-            msgBox.textContent = `✅ Tepat! Tahan posisi ini... ${holdTimer}s`;
+            msgBox.textContent = `✅ Tepat!`;
             
-            holdInterval = setInterval(() => {
-                holdTimer--;
-                if (holdTimer > 0) {
-                    msgBox.textContent = `✅ Tepat! Tahan posisi ini... ${holdTimer}s`;
-                } else {
-                    clearInterval(holdInterval);
+            if (!holdInterval) {
+                holdInterval = setTimeout(() => {
                     holdInterval = null;
-                    submitCam(); 
-                }
-            }, 1000);
+                    submitCam();
+                }, 500); // 0.5 second delay so it doesn't vanish too fast
+            }
+        } else {
+            // STATIC SIGNS: 3 SECOND COUNTDOWN
+            if (!holdInterval) {
+                holdTimer = 3;
+                msgBox.style.background = "#0d2a0d"; 
+                msgBox.style.borderColor = "#4CAF50"; 
+                msgBox.style.color = "#81c784"; 
+                msgBox.textContent = `✅ Tepat! Tahan posisi ini... ${holdTimer}s`;
+                
+                holdInterval = setInterval(() => {
+                    holdTimer--;
+                    if (holdTimer > 0) {
+                        msgBox.textContent = `✅ Tepat! Tahan posisi ini... ${holdTimer}s`;
+                    } else {
+                        clearInterval(holdInterval);
+                        holdInterval = null;
+                        submitCam(); 
+                    }
+                }, 1000);
+            }
         }
       } else { 
         // --- RESET IF DROPPED BELOW 85% ---
         if (holdInterval) {
-            clearInterval(holdInterval);
+            if (currentChapter && currentChapter.id > 1) clearTimeout(holdInterval);
+            else clearInterval(holdInterval);
             holdInterval = null;
         }
         
