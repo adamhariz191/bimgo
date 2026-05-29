@@ -730,24 +730,35 @@ function getGestureScore(sign, lm) {
       if(rngUp) s += 15; 
       if(pnkUp) s += 15; 
       
-      // 2. Dynamic Rule: The "Sweep" (Moving outward/forward)
+      // 2. Dynamic Rule: Sweep OR Circle (Total Path Length)
       if (wristHistory.length > 10) {
           let minX = 1, maxX = 0;
           let minY = 1, maxY = 0;
+          let pathLength = 0; // NEW: The "odometer" for circular tracking
           
-          for (let pos of wristHistory) {
+          for (let i = 0; i < wristHistory.length; i++) {
+              let pos = wristHistory[i];
+              
+              // Find the invisible bounding box (for straight sweeps)
               if (pos.x < minX) minX = pos.x;
               if (pos.x > maxX) maxX = pos.x;
               if (pos.y < minY) minY = pos.y;
               if (pos.y > maxY) maxY = pos.y;
+              
+              // Calculate frame-by-frame distance (for circles)
+              if (i > 0) {
+                  let prev = wristHistory[i-1];
+                  // Math.hypot calculates the diagonal distance between the two points
+                  pathLength += Math.hypot(pos.x - prev.x, pos.y - prev.y);
+              }
           }
           
-          let deltaX = maxX - minX;
-          let deltaY = maxY - minY;
-          let maxSweep = Math.max(deltaX, deltaY);
+          // Combine X and Y for diagonal sweeps
+          let totalSpread = (maxX - minX) + (maxY - minY); 
           
-          if (maxSweep > 0.04) s += 20; 
-          if (maxSweep > 0.08) s += 20; 
+          // If they do a wide sweep (spread) OR a tight chest circle (pathLength)
+          if (totalSpread > 0.08 || pathLength > 0.15) s += 20; 
+          if (totalSpread > 0.15 || pathLength > 0.30) s += 20; 
       }
       break;
     case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
