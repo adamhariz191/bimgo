@@ -723,42 +723,29 @@ function getGestureScore(sign, lm) {
           if (deltaY > 0.12) s += 20; 
       }
       break;
-    case "Please": 
-      // 1. Static Rule: Flat open hand
+case "Please": 
+      // 1. Static Rule: Flat open hand (all four fingers up)
       if(idxUp) s += 15; 
       if(midUp) s += 15; 
       if(rngUp) s += 15; 
       if(pnkUp) s += 15; 
       
-      // 2. Dynamic Rule: Sweep OR Circle (Total Path Length)
+      // 2. Dynamic Rule: Small Circular Motion / Chest Rub
       if (wristHistory.length > 10) {
-          let minX = 1, maxX = 0;
-          let minY = 1, maxY = 0;
-          let pathLength = 0; // NEW: The "odometer" for circular tracking
+          let totalDistance = 0; // Our highly sensitive odometer
           
-          for (let i = 0; i < wristHistory.length; i++) {
-              let pos = wristHistory[i];
+          // Add up every tiny micro-movement the hand makes frame-by-frame
+          for (let i = 1; i < wristHistory.length; i++) {
+              let currentPos = wristHistory[i];
+              let prevPos = wristHistory[i-1];
               
-              // Find the invisible bounding box (for straight sweeps)
-              if (pos.x < minX) minX = pos.x;
-              if (pos.x > maxX) maxX = pos.x;
-              if (pos.y < minY) minY = pos.y;
-              if (pos.y > maxY) maxY = pos.y;
-              
-              // Calculate frame-by-frame distance (for circles)
-              if (i > 0) {
-                  let prev = wristHistory[i-1];
-                  // Math.hypot calculates the diagonal distance between the two points
-                  pathLength += Math.hypot(pos.x - prev.x, pos.y - prev.y);
-              }
+              // Math.hypot measures the distance between the last frame and this frame
+              totalDistance += Math.hypot(currentPos.x - prevPos.x, currentPos.y - prevPos.y);
           }
           
-          // Combine X and Y for diagonal sweeps
-          let totalSpread = (maxX - minX) + (maxY - minY); 
-          
-          // If they do a wide sweep (spread) OR a tight chest circle (pathLength)
-          if (totalSpread > 0.08 || pathLength > 0.15) s += 20; 
-          if (totalSpread > 0.15 || pathLength > 0.30) s += 20; 
+          // Because the thresholds are much lower, a small tight circle will pass
+          if (totalDistance > 0.05) s += 20; // Very small circle/rub detected
+          if (totalDistance > 0.10) s += 20; // Clear circular motion detected!
       }
       break;
     case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
