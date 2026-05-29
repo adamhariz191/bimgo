@@ -87,6 +87,7 @@
   .gif-container { background: #111; border: 1px solid #374151; border-radius: 20px; padding: 20px; margin-bottom: 20px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
   .lesson-gif-img { width: 100%; max-width: 280px; border-radius: 12px; object-fit: cover; }
 
+  /* MCQ QUIZ GRID */
   .quiz-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
   .quiz-btn { padding: 20px 10px; font-size: 18px; font-weight: 900; border-radius: 16px; border: 2px solid #374151; background: #1f2937; color: #fff; cursor: pointer; transition: all 0.2s; text-align: center; }
   .quiz-btn:active { transform: scale(0.95); }
@@ -203,7 +204,9 @@
             <p id="t-les-watch" style="text-align:center; color:#9ca3af; font-size:15px; margin-bottom:10px;">Tonton demonstrasi di bawah.</p>
             
             <div class="gif-container">
-                <video id="lesson-vid" class="lesson-gif-img" autoplay loop muted playsinline></video>
+                <video id="lesson-vid" class="lesson-gif-img" autoplay loop muted playsinline style="display:none;"></video>
+                <img id="lesson-img" class="lesson-gif-img" style="display:none;" alt="Sign Language Image">
+                
                 <div style="margin-top: 16px;">
                     <div style="font-weight:900; font-size:40px; color:#4CAF50;" id="vid-sign-name">A</div>
                     <div id="t-les-visual" style="font-size:13px; color:#81c784; margin-top:4px;">Demonstrasi Visual</div>
@@ -428,14 +431,23 @@ const CHAPTERS = [
   }
 ];
 
-// --- THE MEDIA DICTIONARY ---
+// --- SMART MEDIA DICTIONARY (MATCHED TO UPLOADED ASSETS) ---
 const SIGN_MEDIA = {
     "A": "./assets/A.mp4",
     "B": "./assets/B.mp4",
     "C": "./assets/C.mp4",
     "D": "./assets/D.mp4",
-    "E": "./assets/E.mp4"
-    // Keep adding here as you upload more videos!
+    "E": "./assets/E.mp4",
+    "Hello": "./assets/Hello.mp4",
+    "Good Morning": "./assets/Good Morning.mp4",
+    "Good Night": "./assets/Good Night.mp4",
+    "Mother": "./assets/Mother.mp4",
+    "Father": "./assets/Father.mp4",
+    "Brother": "./assets/Brother.mp4",
+    "Sister": "./assets/Sister.mp4",
+    "Help": "./assets/Help.mp4",
+    "Stop": "./assets/Stop.mp4",
+    "Danger": "./assets/Danger.mp4"
 };
 
 const AVATARS=["🦁","🐯","🦊","🐼","🐨","🦋","🦜","🐬"];
@@ -688,29 +700,44 @@ function renderLessonView() {
   document.getElementById("vid-sign-name").textContent=sign;
   document.getElementById("t-les-link").href=signBankUrl(sign);
   
-  // --- FIXED MEDIA LOOKUP ---
-  const videoUrl = SIGN_MEDIA[sign] || "https://www.w3schools.com/html/mov_bbb.mp4"; 
+  // --- SMART MEDIA LOOKUP ---
+  const mediaUrl = SIGN_MEDIA[sign] || "https://via.placeholder.com/400x300/111c11/4CAF50?text=Tiada+Media"; 
   const vidPlayer = document.getElementById("lesson-vid");
+  const imgPlayer = document.getElementById("lesson-img");
   
-  // 1. Force the player to be muted in JS (Required by iOS Safari & Android Chrome)
-  vidPlayer.removeAttribute("src"); 
-  vidPlayer.muted = true;
-  vidPlayer.playsInline = true;
-  vidPlayer.src = videoUrl;
-  
-  // 2. Force the player to reload the new video file structure
-  vidPlayer.load();
-  
-  // 3. Play with a slight fallback delay if the browser tries to block it
-  var playPromise = vidPlayer.play();
-  if (playPromise !== undefined) {
-      playPromise.catch(error => {
-          console.log("Auto-play prevented. Adding backup interaction click listener.");
-          // Fallback: Play as soon as the user interacts with the screen anywhere
-          document.body.addEventListener('click', () => {
-              vidPlayer.play();
-          }, { once: true });
-      });
+  // Check if the file is a video (.mp4 or .webm)
+  if (mediaUrl.toLowerCase().endsWith(".mp4") || mediaUrl.toLowerCase().endsWith(".webm")) {
+      // Hide Image, Show Video
+      imgPlayer.style.display = "none";
+      vidPlayer.style.display = "block";
+      
+      // 1. Force the player to be muted in JS (Required by iOS Safari & Android Chrome)
+      vidPlayer.removeAttribute("src"); 
+      vidPlayer.muted = true;
+      vidPlayer.playsInline = true;
+      vidPlayer.src = mediaUrl;
+      
+      // 2. Force the player to reload the new video file structure
+      vidPlayer.load();
+      
+      // 3. Play with a slight fallback delay if the browser tries to block it
+      var playPromise = vidPlayer.play();
+      if (playPromise !== undefined) {
+          playPromise.catch(error => {
+              console.log("Auto-play prevented. Adding backup interaction click listener.");
+              // Fallback: Play as soon as the user interacts with the screen anywhere
+              document.body.addEventListener('click', () => {
+                  vidPlayer.play();
+              }, { once: true });
+          });
+      }
+  } else {
+      // It is a Picture (.png, .jpg, .gif) -> Hide Video, Show Image
+      vidPlayer.style.display = "none";
+      vidPlayer.pause(); 
+      
+      imgPlayer.style.display = "block";
+      imgPlayer.src = mediaUrl;
   }
   // ------------------------------------
 
