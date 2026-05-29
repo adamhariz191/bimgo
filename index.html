@@ -677,6 +677,25 @@ function getGestureScore(sign, lm) {
           if (deltaX > 0.08) s += 20; // Full wave
       }
       break;
+    case "Good Morning": 
+      // 1. Static Rule: Flat open hand (Index, Mid, Ring, Pinky all UP)
+      if(idxUp) s += 15; 
+      if(midUp) s += 15; 
+      if(rngUp) s += 15; 
+      if(pnkUp) s += 15; 
+      
+      // 2. Dynamic Rule: Did the wrist move UPWARD? ("Pagi" sunrise motion)
+      // We need at least 10 frames of history to calculate movement
+      if (wristHistory.length > 10) {
+          let startY = wristHistory[0].y; // Where the wrist was ~1 second ago
+          let endY = wristHistory[wristHistory.length - 1].y; // Where the wrist is right now
+          
+          let deltaY = startY - endY; // Will be positive if the hand moved UP (towards top of screen)
+          
+          if (deltaY > 0.05) s += 20; // Small upward movement detected
+          if (deltaY > 0.12) s += 20; // Clear upward "sunrise" movement detected!
+      }
+      break;
     case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
     case "B": if(idxUp) s+=20; if(midUp) s+=20; if(rngUp) s+=20; if(pnkUp) s+=20; if(lm[4].x > Math.min(lm[5].x, lm[17].x) && lm[4].x < Math.max(lm[5].x, lm[17].x)) s+=20; break;
     case "C": if(!idxUp && !midUp) s+=50; if(lm[4].x < lm[5].x) s+=50; break; 
