@@ -703,6 +703,53 @@ function getGestureScore(sign, lm) {
           if (deltaY > 0.12) s += 20; 
       }
       break;
+    case "Thank you": 
+      // 1. Static Rule: Flat hand (fingers up)
+      if(idxUp) s += 15; 
+      if(midUp) s += 15; 
+      if(rngUp) s += 15; 
+      if(pnkUp) s += 15; 
+      
+      // 2. Dynamic Rule: Did the hand move DOWNWARD? (From chin to chest space)
+      if (wristHistory.length > 10) {
+          let minY = 1; // The highest physical point the hand was recently
+          for (let pos of wristHistory) {
+              if (pos.y < minY) minY = pos.y; 
+          }
+          let currentY = wristHistory[wristHistory.length - 1].y; 
+          let deltaY = currentY - minY; // Positive if hand moved DOWN
+          
+          if (deltaY > 0.05) s += 20; 
+          if (deltaY > 0.12) s += 20; 
+      }
+      break;
+    case "Please": 
+      // 1. Static Rule: Flat open hand
+      if(idxUp) s += 15; 
+      if(midUp) s += 15; 
+      if(rngUp) s += 15; 
+      if(pnkUp) s += 15; 
+      
+      // 2. Dynamic Rule: The "Sweep" (Moving outward/forward)
+      if (wristHistory.length > 10) {
+          let minX = 1, maxX = 0;
+          let minY = 1, maxY = 0;
+          
+          for (let pos of wristHistory) {
+              if (pos.x < minX) minX = pos.x;
+              if (pos.x > maxX) maxX = pos.x;
+              if (pos.y < minY) minY = pos.y;
+              if (pos.y > maxY) maxY = pos.y;
+          }
+          
+          let deltaX = maxX - minX;
+          let deltaY = maxY - minY;
+          let maxSweep = Math.max(deltaX, deltaY);
+          
+          if (maxSweep > 0.04) s += 20; 
+          if (maxSweep > 0.08) s += 20; 
+      }
+      break;
     case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
     case "B": if(idxUp) s+=20; if(midUp) s+=20; if(rngUp) s+=20; if(pnkUp) s+=20; if(lm[4].x > Math.min(lm[5].x, lm[17].x) && lm[4].x < Math.max(lm[5].x, lm[17].x)) s+=20; break;
     case "C": if(!idxUp && !midUp) s+=50; if(lm[4].x < lm[5].x) s+=50; break; 
