@@ -664,8 +664,7 @@ function getGestureScore(sign, lm) {
   if (sign.length > 1 && sign !== "Hello") { return Math.random() * 100; }
 
   switch(sign.trim()) {
- case "Hello": 
-    case "Bye": 
+ case "Hello": {
       // 1. Check for "Open Palm"
       let fingersUpCount = 0;
       if (idxUp) fingersUpCount++;
@@ -673,7 +672,7 @@ function getGestureScore(sign, lm) {
       if (rngUp) fingersUpCount++;
       if (pnkUp) fingersUpCount++;
       
-      // Give some base points just for opening the hand so the progress bar moves
+      // Give base points
       s += (fingersUpCount * 10); 
       
       // 2. Check for "Side-to-Side" movement
@@ -683,19 +682,49 @@ function getGestureScore(sign, lm) {
               if (pos.x < minX) minX = pos.x;
               if (pos.x > maxX) maxX = pos.x;
           }
-          let deltaX = maxX - minX; // Measures the horizontal sweep
+          let deltaX = maxX - minX; 
           
-          // Give points for moving so the user sees the bar filling up
           if (deltaX > 0.03) s += 30; 
           if (deltaX > 0.06) s += 30; 
           
-          // 3. THE MASTER OVERRIDE
-          // If they have an open palm (at least 3 fingers up) AND they sweep side-to-side
+          // MASTER OVERRIDE FOR HELLO
           if (fingersUpCount >= 3 && deltaX > 0.05) {
-              s = 100; // Instantly give them 100% and pass the level!
+              s = 100; 
           }
       }
       break;
+    }
+
+    case "Bye": {
+      // 1. Check for "Open Palm"
+      let fingersUpCount = 0;
+      if (idxUp) fingersUpCount++;
+      if (midUp) fingersUpCount++;
+      if (rngUp) fingersUpCount++;
+      if (pnkUp) fingersUpCount++;
+      
+      // Give base points
+      s += (fingersUpCount * 10); 
+      
+      // 2. Check for "Side-to-Side" movement
+      if (wristHistory.length > 10) {
+          let minX = 1, maxX = 0;
+          for (let pos of wristHistory) {
+              if (pos.x < minX) minX = pos.x;
+              if (pos.x > maxX) maxX = pos.x;
+          }
+          let deltaX = maxX - minX; 
+          
+          if (deltaX > 0.03) s += 30; 
+          if (deltaX > 0.06) s += 30; 
+          
+          // MASTER OVERRIDE FOR BYE
+          if (fingersUpCount >= 3 && deltaX > 0.05) {
+              s = 100; 
+          }
+      }
+      break;
+    }
 case "Father":
       // FATHER: Open hand moving UP
       let fatherFingers = 0;
