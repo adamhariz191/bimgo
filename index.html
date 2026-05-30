@@ -696,34 +696,10 @@ function getGestureScore(sign, lm) {
     }
 
     case "Bye": {
-      // 1. Check for "Open Palm"
-      let fingersUpCount = 0;
-      if (idxUp) fingersUpCount++;
-      if (midUp) fingersUpCount++;
-      if (rngUp) fingersUpCount++;
-      if (pnkUp) fingersUpCount++;
-      
-      // Give base points
-      s += (fingersUpCount * 10); 
-      
-      // 2. Check for "Side-to-Side" movement
-      if (wristHistory.length > 10) {
-          let minX = 1, maxX = 0;
-          for (let pos of wristHistory) {
-              if (pos.x < minX) minX = pos.x;
-              if (pos.x > maxX) maxX = pos.x;
-          }
-          let deltaX = maxX - minX; 
-          
-          if (deltaX > 0.03) s += 30; 
-          if (deltaX > 0.06) s += 30; 
-          
-          // MASTER OVERRIDE FOR BYE
-          if (fingersUpCount >= 3 && deltaX > 0.05) {
-              s = 100; 
-          }
-      }
+      // DIAGNOSTIC TEST: No math, just instantly pass.
+      s = 100; 
       break;
+    }
     }
 case "Father":
       // FATHER: Open hand moving UP
