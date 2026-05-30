@@ -665,34 +665,9 @@ function getGestureScore(sign, lm) {
 
  alert("The app sees: [" + sign + "]");
     switch((sign || "").trim()) {
- case "Hello": {
-      // 1. Check for "Open Palm"
-      let fingersUpCount = 0;
-      if (idxUp) fingersUpCount++;
-      if (midUp) fingersUpCount++;
-      if (rngUp) fingersUpCount++;
-      if (pnkUp) fingersUpCount++;
-      
-      // Give base points
-      s += (fingersUpCount * 10); 
-      
-      // 2. Check for "Side-to-Side" movement
-      if (wristHistory.length > 10) {
-          let minX = 1, maxX = 0;
-          for (let pos of wristHistory) {
-              if (pos.x < minX) minX = pos.x;
-              if (pos.x > maxX) maxX = pos.x;
-          }
-          let deltaX = maxX - minX; 
-          
-          if (deltaX > 0.03) s += 30; 
-          if (deltaX > 0.06) s += 30; 
-          
-          // MASTER OVERRIDE FOR HELLO
-          if (fingersUpCount >= 3 && deltaX > 0.05) {
-              s = 100; 
-          }
-      }
+case "Hello": {
+      // DIAGNOSTIC TEST: Instantly pass Hello to unlock Bye
+      s = 100; 
       break;
     }
 
