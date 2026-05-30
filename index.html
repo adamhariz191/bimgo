@@ -664,34 +664,36 @@ function getGestureScore(sign, lm) {
   if (sign.length > 1 && sign !== "Hello") { return Math.random() * 100; }
 
   switch(sign) {
-  case "Hello": 
+ case "Hello": 
     case "Bye": 
-      // 1. Static Rule: Highly Forgiving Hand Open
-      // We only check 3 fingers now, and they are worth 20 points each (Total 60)
-      if(idxUp) s += 20; 
-      if(midUp) s += 20; 
-      if(rngUp) s += 20; 
-      // We completely removed the pinky check so it won't fail you for a relaxed hand!
+      // 1. Check for "Open Palm"
+      let fingersUpCount = 0;
+      if (idxUp) fingersUpCount++;
+      if (midUp) fingersUpCount++;
+      if (rngUp) fingersUpCount++;
+      if (pnkUp) fingersUpCount++;
       
-      // 2. Dynamic Rule: The "Odometer" (Keep your existing dynamic rule below this!)
+      // Give some base points just for opening the hand so the progress bar moves
+      s += (fingersUpCount * 10); 
+      
+      // 2. Check for "Side-to-Side" movement
       if (wristHistory.length > 10) {
           let minX = 1, maxX = 0;
-          let pathLength = 0; 
-          
-          for (let i = 0; i < wristHistory.length; i++) {
-              let pos = wristHistory[i];
+          for (let pos of wristHistory) {
               if (pos.x < minX) minX = pos.x;
               if (pos.x > maxX) maxX = pos.x;
-              
-              if (i > 0) {
-                  let prev = wristHistory[i-1];
-                  pathLength += Math.hypot(pos.x - prev.x, pos.y - prev.y);
-              }
           }
+          let deltaX = maxX - minX; // Measures the horizontal sweep
           
-          let deltaX = maxX - minX; 
-          if (deltaX > 0.04 || pathLength > 0.10) s += 20; 
-          if (deltaX > 0.08 || pathLength > 0.20) s += 20; 
+          // Give points for moving so the user sees the bar filling up
+          if (deltaX > 0.03) s += 30; 
+          if (deltaX > 0.06) s += 30; 
+          
+          // 3. THE MASTER OVERRIDE
+          // If they have an open palm (at least 3 fingers up) AND they sweep side-to-side
+          if (fingersUpCount >= 3 && deltaX > 0.05) {
+              s = 100; // Instantly give them 100% and pass the level!
+          }
       }
       break;
 
