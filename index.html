@@ -396,9 +396,9 @@ const CHAPTERS = [
   },
   {
     id: 2, dictKey: "ch2", subtitle: "Greetings", icon: "👋", color: "#2196F3",
-   levels: [
-      { id: "2-1", title: "Politeness", signs: ["Please", "Thank you", "You're Welcome"], xp: 500, gifSrc: "" },
-      { id: "2-2", title: "The Basics", signs: ["Hello", "Good Morning", "Good Night"], xp: 500, gifSrc: "" },
+  levels: [
+      { id: "2-1", title: "The Basics", signs: ["Hello", "Bye"], xp: 500, gifSrc: "" },
+      { id: "2-2", title: "Politeness", signs: ["Thank you", "You're Welcome"], xp: 500, gifSrc: "" },
       { id: "2-3", title: "Apologies", signs: ["Sorry", "Excuse Me", "It's Okay"], xp: 500, gifSrc: "" },
       { id: "2-4", title: "Introductions", signs: ["My name is", "How are you?", "I am fine"], xp: 500, gifSrc: "" },
       { id: "2-5", title: "Farewells & Well Wish", signs: ["See you later", "Nice to meet you", "Good luck"], xp: 500, gifSrc: "" },
@@ -430,15 +430,15 @@ const CHAPTERS = [
 ];
 
 const SIGN_MEDIA = {
-    "Please": "./assets/Please.mp4",
+    "Hello": "./assets/Hello.mp4",
+    "Bye": "./assets/Good Bye.mp4",
     "Thank you": "./assets/Thank you.mp4",
-    "You're Welcome": "./assets/Welcome.mp4",
+    "You're Welcome": "./assets/You're Welcome.mp4",
     "A": "./assets/A.mp4",
     "B": "./assets/B.mp4",
     "C": "./assets/C.mp4",
     "D": "./assets/D.mp4",
     "E": "./assets/E.mp4",
-    "Hello": "./assets/Hello.mp4",
     "Good Morning": "./assets/Good Morning.mp4",
     "Good Night": "./assets/Good Night.mp4",
     "Mother": "./assets/Mother.mp4",
@@ -665,10 +665,15 @@ function getGestureScore(sign, lm) {
 
   switch(sign) {
     case "Hello": 
-      // Static Rule: Hand Open
-      if(idxUp) s += 15; if(midUp) s += 15; if(rngUp) s += 15; if(pnkUp) s += 15; 
+    case "Bye": 
+      // HELLO & BYE: Both use the Side-to-Side Wave
+      // 1. Static Rule: Hand Open
+      if(idxUp) s += 15; 
+      if(midUp) s += 15; 
+      if(rngUp) s += 15; 
+      if(pnkUp) s += 15; 
       
-      // Dynamic Rule: Did the wrist wave side-to-side?
+      // 2. Dynamic Rule: Waving side-to-side (Delta X)
       if (wristHistory.length > 10) {
           let minX = 1, maxX = 0;
           for (let pos of wristHistory) {
@@ -676,43 +681,23 @@ function getGestureScore(sign, lm) {
               if (pos.x > maxX) maxX = pos.x;
           }
           let deltaX = maxX - minX; 
-          if (deltaX > 0.04) s += 20; // Small wave
-          if (deltaX > 0.08) s += 20; // Full wave
+          if (deltaX > 0.04) s += 20; 
+          if (deltaX > 0.08) s += 20; 
       }
       break;
-   case "Good Morning": 
-      // 1. Static Rule: Flat open hand (Index, Mid, Ring, Pinky all UP)
-      if(idxUp) s += 15; 
-      if(midUp) s += 15; 
-      if(rngUp) s += 15; 
-      if(pnkUp) s += 15; 
-      
-      // 2. Dynamic Rule: Forgiving "Upward" check
-      if (wristHistory.length > 10) {
-          let maxY = 0; // The lowest physical point on the screen the hand was recently
-          
-          // Look through history to find the lowest point
-          for (let pos of wristHistory) {
-              if (pos.y > maxY) maxY = pos.y; 
-          }
-          
-          let currentY = wristHistory[wristHistory.length - 1].y; // Where the hand is right now
-          let deltaY = maxY - currentY; // Calculate how far UP it moved from the lowest point
-          
-          if (deltaY > 0.05) s += 20; 
-          if (deltaY > 0.12) s += 20; 
-      }
-      break;
+
     case "Thank you": 
+    case "You're Welcome": 
+      // THANK YOU & WELCOME: Both use the Downward/Forward Nod
       // 1. Static Rule: Flat hand (fingers up)
       if(idxUp) s += 15; 
       if(midUp) s += 15; 
       if(rngUp) s += 15; 
       if(pnkUp) s += 15; 
       
-      // 2. Dynamic Rule: Did the hand move DOWNWARD? (From chin to chest space)
+      // 2. Dynamic Rule: Moving DOWNWARD (Delta Y)
       if (wristHistory.length > 10) {
-          let minY = 1; // The highest physical point the hand was recently
+          let minY = 1; 
           for (let pos of wristHistory) {
               if (pos.y < minY) minY = pos.y; 
           }
@@ -721,31 +706,6 @@ function getGestureScore(sign, lm) {
           
           if (deltaY > 0.05) s += 20; 
           if (deltaY > 0.12) s += 20; 
-      }
-      break;
-case "Please": 
-      // 1. Static Rule: Flat open hand (all four fingers up)
-      if(idxUp) s += 15; 
-      if(midUp) s += 15; 
-      if(rngUp) s += 15; 
-      if(pnkUp) s += 15; 
-      
-      // 2. Dynamic Rule: Small Circular Motion / Chest Rub
-      if (wristHistory.length > 10) {
-          let totalDistance = 0; // Our highly sensitive odometer
-          
-          // Add up every tiny micro-movement the hand makes frame-by-frame
-          for (let i = 1; i < wristHistory.length; i++) {
-              let currentPos = wristHistory[i];
-              let prevPos = wristHistory[i-1];
-              
-              // Math.hypot measures the distance between the last frame and this frame
-              totalDistance += Math.hypot(currentPos.x - prevPos.x, currentPos.y - prevPos.y);
-          }
-          
-          // Because the thresholds are much lower, a small tight circle will pass
-          if (totalDistance > 0.05) s += 20; // Very small circle/rub detected
-          if (totalDistance > 0.10) s += 20; // Clear circular motion detected!
       }
       break;
     case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
