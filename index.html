@@ -661,7 +661,6 @@ function getGestureScore(sign, lm) {
   const isUp = (tip, pip) => lm[tip].y < lm[pip].y;
   const idxUp = isUp(8, 6); const midUp = isUp(12, 10); const rngUp = isUp(16, 14); const pnkUp = isUp(20, 18);
   let s = 0;
-  if (sign.length > 1 && sign !== "Hello") { return Math.random() * 100; }
 
 switch((sign || "").trim()) {
         case "Hello": {
