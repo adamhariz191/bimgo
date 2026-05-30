@@ -663,7 +663,8 @@ function getGestureScore(sign, lm) {
   let s = 0;
   if (sign.length > 1 && sign !== "Hello") { return Math.random() * 100; }
 
-  switch(sign.trim()) {
+ alert("The app sees: [" + sign + "]");
+    switch((sign || "").trim()) {
  case "Hello": {
       // 1. Check for "Open Palm"
       let fingersUpCount = 0;
