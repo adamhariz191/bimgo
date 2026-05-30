@@ -664,25 +664,34 @@ function getGestureScore(sign, lm) {
   if (sign.length > 1 && sign !== "Hello") { return Math.random() * 100; }
 
   switch(sign) {
-    case "Hello": 
+  case "Hello": 
     case "Bye": 
-      // HELLO & BYE: Both use the Side-to-Side Wave
-      // 1. Static Rule: Hand Open
-      if(idxUp) s += 15; 
-      if(midUp) s += 15; 
-      if(rngUp) s += 15; 
-      if(pnkUp) s += 15; 
+      // 1. Static Rule: Highly Forgiving Hand Open
+      // We only check 3 fingers now, and they are worth 20 points each (Total 60)
+      if(idxUp) s += 20; 
+      if(midUp) s += 20; 
+      if(rngUp) s += 20; 
+      // We completely removed the pinky check so it won't fail you for a relaxed hand!
       
-      // 2. Dynamic Rule: Waving side-to-side (Delta X)
+      // 2. Dynamic Rule: The "Odometer" (Keep your existing dynamic rule below this!)
       if (wristHistory.length > 10) {
           let minX = 1, maxX = 0;
-          for (let pos of wristHistory) {
+          let pathLength = 0; 
+          
+          for (let i = 0; i < wristHistory.length; i++) {
+              let pos = wristHistory[i];
               if (pos.x < minX) minX = pos.x;
               if (pos.x > maxX) maxX = pos.x;
+              
+              if (i > 0) {
+                  let prev = wristHistory[i-1];
+                  pathLength += Math.hypot(pos.x - prev.x, pos.y - prev.y);
+              }
           }
+          
           let deltaX = maxX - minX; 
-          if (deltaX > 0.04) s += 20; 
-          if (deltaX > 0.08) s += 20; 
+          if (deltaX > 0.04 || pathLength > 0.10) s += 20; 
+          if (deltaX > 0.08 || pathLength > 0.20) s += 20; 
       }
       break;
 
