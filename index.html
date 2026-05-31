@@ -727,63 +727,53 @@ switch((sign || "").trim()) {
             }
             break;
         }
-case "Father":
-      // FATHER: Open hand moving UP
-      let fatherFingers = 0;
-      if (idxUp) fatherFingers++; if (midUp) fatherFingers++; if (rngUp) fatherFingers++;
-      s += (fatherFingers * 15); 
-      
-      if (wristHistory.length > 10) {
-          let maxY = 0; 
-          for (let pos of wristHistory) {
-              if (pos.y > maxY) maxY = pos.y; 
-          }
-          let currentY = wristHistory[wristHistory.length - 1].y; 
-          // Negative deltaY means the hand moved UP the screen
-          let deltaY = currentY - maxY; 
-          
-          if (deltaY < -0.04) s = 100; // Instantly pass if moving up!
-      }
-      break;
+case "Father": {
+            let fatherFingers = 0;
+            if (idxUp) fatherFingers++; if (midUp) fatherFingers++; if (rngUp) fatherFingers++;
+            s += (fatherFingers * 15); 
+            
+            if (wristHistory.length > 10) {
+                let maxY = 0; 
+                for (let pos of wristHistory) { if (pos.y > maxY) maxY = pos.y; }
+                let currentY = wristHistory[wristHistory.length - 1].y; 
+                let deltaY = currentY - maxY; // Calculates UPWARD movement
+                if (deltaY < -0.04) s = 100; 
+            }
+            break;
+        }
 
-    case "Mother":
-      // MOTHER: Open hand moving DOWN
-      let motherFingers = 0;
-      if (idxUp) motherFingers++; if (midUp) motherFingers++; if (rngUp) motherFingers++;
-      s += (motherFingers * 15); 
-      
-      if (wristHistory.length > 10) {
-          let minY = 1; 
-          for (let pos of wristHistory) {
-              if (pos.y < minY) minY = pos.y; 
-          }
-          let currentY = wristHistory[wristHistory.length - 1].y; 
-          // Positive deltaY means the hand moved DOWN the screen
-          let deltaY = currentY - minY; 
-          
-          if (deltaY > 0.04) s = 100; // Instantly pass if moving down!
-      }
-      break;
+    case "Mother": {
+            let motherFingers = 0;
+            if (idxUp) motherFingers++; if (midUp) motherFingers++; if (rngUp) motherFingers++;
+            s += (motherFingers * 15); 
+            
+            if (wristHistory.length > 10) {
+                let minY = 1; 
+                for (let pos of wristHistory) { if (pos.y < minY) minY = pos.y; }
+                let currentY = wristHistory[wristHistory.length - 1].y; 
+                let deltaY = currentY - minY; // Calculates DOWNWARD movement
+                if (deltaY > 0.04) s = 100; 
+            }
+            break;
+        }
 
-    case "Brother":
-    case "Sister":
-      // BROTHER & SISTER: Let's use the "Odometer" to catch a distinct short movement
-      // Give points just for having the hand visible on screen
-      if (wristHistory.length > 0) s += 40;
-      
-      if (wristHistory.length > 10) {
-          let pathLength = 0;
-          for (let i = 1; i < wristHistory.length; i++) {
-              let pos = wristHistory[i];
-              let prev = wristHistory[i-1];
-              pathLength += Math.hypot(pos.x - prev.x, pos.y - prev.y);
-          }
-          
-          // If they make a firm, distinct motion (like a sign for sibling)
-          if (pathLength > 0.15) s += 30;
-          if (pathLength > 0.25) s = 100; // Instantly pass on enough movement!
-      }
-      break;
+   case "Brother":
+        case "Sister": {
+            // Base points just for showing your hand
+            if (wristHistory.length > 0) s += 40;
+            
+            if (wristHistory.length > 10) {
+                let pathLength = 0;
+                for (let i = 1; i < wristHistory.length; i++) {
+                    let pos = wristHistory[i]; let prev = wristHistory[i-1];
+                    pathLength += Math.hypot(pos.x - prev.x, pos.y - prev.y);
+                }
+                // Calculates total distance traveled
+                if (pathLength > 0.15) s += 30;
+                if (pathLength > 0.25) s = 100; 
+            }
+            break;
+        }
     case "Thank you": 
     case "You're Welcome": 
       // THANK YOU & WELCOME: Both use the Downward/Forward Nod
