@@ -161,6 +161,104 @@ function getGestureScore(sign, lm) {
           if (deltaY > 0.12) s += 20; 
       }
       break;
+      case "Help": {
+            let score = 0;
+            
+            // 1. The Shape: "Thumbs Up" 
+            let isFist = !idxUp && !midUp && !rngUp && !pnkUp;
+            let thumbIsUp = lm[4].y < lm[5].y; 
+            
+            if (isFist && thumbIsUp) {
+                score += 50; // 50 points locked in for a perfect shape
+            } else if (isFist) {
+                score += 20; // Partial points if the thumb isn't clearly up yet
+            }
+            
+            // 2. The Movement: Force a deliberate DOWN to UP motion
+            // STRICT RULE: ONLY check for movement if the shape is already a perfect 50!
+            if (score === 50 && wristHistory.length > 15) {
+                // Find the absolute LOWEST point the hand has been in recent memory
+                // (Remember, higher Y-value = lower on the screen)
+                let lowestY = 0;
+                for (let pos of wristHistory) {
+                    if (pos.y > lowestY) lowestY = pos.y; 
+                }
+                
+                let currentY = wristHistory[wristHistory.length - 1].y;
+                let deltaY = lowestY - currentY; // Distance traveled UP from the very bottom
+                
+                // We increased the required distance threshold to prevent instant triggers
+                if (deltaY > 0.10) score += 25; // Started lifting
+                if (deltaY > 0.20) score += 25; // Deliberate, clear lift (Hits 100%)
+            }
+            
+            s = score;
+            break;
+        }
+        case "Stop": {
+            let score = 0;
+            
+            // 1. The Shape: Flat Hand (All 4 fingers extended)
+            if (idxUp && midUp && rngUp && pnkUp) {
+                score += 50; // 50 points locked in for a perfect flat hand
+            } else if (idxUp && midUp && rngUp) {
+                score += 20; // Partial points if the pinky drops slightly
+            }
+            
+            // 2. The Movement: A sharp chop DOWNWARDS
+            // STRICT RULE: ONLY check for movement if the shape is already a flat hand!
+            if (score === 50 && wristHistory.length > 10) {
+                // Find the absolute HIGHEST point the hand has been in recent memory
+                // (Remember, lower Y-value = higher on the screen. So we look for the minimum Y)
+                let highestY = 1; // Start at the bottom (1.0) and search for the top
+                for (let pos of wristHistory) {
+                    if (pos.y < highestY) highestY = pos.y; 
+                }
+                
+                let currentY = wristHistory[wristHistory.length - 1].y;
+                
+                // Calculate downward drop (Current Y minus the Highest Y)
+                let deltaY = currentY - highestY; 
+                
+                if (deltaY > 0.08) score += 25; // Hand is chopping downwards
+                if (deltaY > 0.15) score += 25; // Sharp downward chop completed! (Hits 100%)
+            }
+            
+            // Lock in the final score
+            s = score;
+            break;
+        }
+    case "Danger": {
+            let score = 0;
+            
+            // 1. The Shape: Flat hand chopping down (4 fingers extended)
+            if (idxUp && midUp && rngUp && pnkUp) {
+                score += 40; // Perfect flat hand
+            } else if (idxUp && midUp) {
+                score += 20; // Partial credit if ring/pinky are slightly curled
+            }
+            
+            // 2. The Movement: Up and down twice (Accumulating Y-axis distance)
+            if (wristHistory.length > 15) { // Need slightly more memory for a double chop
+                let totalVerticalMovement = 0;
+                
+                // Loop through the history and add up every vertical shift
+                for (let i = 1; i < wristHistory.length; i++) {
+                    // Math.abs turns negative numbers into positives, so moving UP 
+                    // and moving DOWN both add to the total distance traveled!
+                    totalVerticalMovement += Math.abs(wristHistory[i].y - wristHistory[i-1].y);
+                }
+                
+                // A single swipe down might total 0.15. 
+                // A down-up-down double chop will easily double that!
+                if (totalVerticalMovement > 0.15) score += 30; // Caught at least one chop
+                if (totalVerticalMovement > 0.30) score += 30; // Caught the double chop!
+            }
+            
+            // Lock in the final score
+            s = score;
+            break;
+        }
     case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
     case "B": if(idxUp) s+=20; if(midUp) s+=20; if(rngUp) s+=20; if(pnkUp) s+=20; if(lm[4].x > Math.min(lm[5].x, lm[17].x) && lm[4].x < Math.max(lm[5].x, lm[17].x)) s+=20; break;
     case "C": if(!idxUp && !midUp) s+=50; if(lm[4].x < lm[5].x) s+=50; break; 

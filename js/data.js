@@ -14,7 +14,19 @@ const i18n = {
     stat_totalxp: "Jumlah Keseluruhan XP", stat_lvldone: "tahap selesai", you: "Anda",
     err_mismatch: "⚠️ Kata laluan tidak sepadan!", err_exists: "⚠️ E-mel wujud!", err_notfound: "❌ Akaun tidak dijumpai.", err_wrongpass: "❌ Kata Laluan salah.", err_req: "Sila masukkan nama!",
     auth_loading: "Memuatkan...", res_acc: "Ketepatan Purata",
-    quiz_title: "Kuiz Kemahiran", quiz_q: "Pilih jawapan yang betul:", quiz_pass: "Lulus Kuiz!", quiz_fail: "Belum Lulus", quiz_req: "Perlu sekurang-kurangnya 6/8.", quiz_score: "Markah Kuiz"
+    quiz_title: "Kuiz Kemahiran", quiz_q: "Pilih jawapan yang betul:", quiz_pass: "Lulus Kuiz!", quiz_fail: "Belum Lulus", quiz_req: "Perlu sekurang-kurangnya 6/8.", quiz_score: "Markah Kuiz",
+    
+    // LEVEL TITLES (MALAY)
+    lvl_lettersA_E: "Huruf A – E", lvl_lettersF_J: "Huruf F – J", lvl_lettersK_O: "Huruf K – O", lvl_lettersP_T: "Huruf P – T", lvl_lettersU_Z: "Huruf U – Z", lvl_quiz: "Kuiz Kemahiran",
+    lvl_quick_greet: "Sapaan Pantas", lvl_polite: "Kesopanan", lvl_well_wish: "Ucapan Baik", lvl_time_day: "Masa", lvl_intro: "Pengenalan Diri",
+    lvl_basic_needs: "Keperluan Asas", lvl_core_fam: "Keluarga Asas", lvl_time_act: "Masa & Tindakan", lvl_ext_fam: "Keluarga Besar", lvl_pres_act: "Tindakan Semasa",
+    lvl_first_resp: "Tindak Balas Awal", lvl_imm_alert: "Amaran Segera", lvl_med_haz: "Perubatan & Bahaya", lvl_sec_safe: "Keselamatan", lvl_sev_sit: "Situasi Cemas",
+    
+    // SIGN NAMES (MALAY)
+    sign_Hello: "Helo", sign_Bye: "Selamat Tinggal", sign_Please: "Tolong (Minta)", "sign_Thank you": "Terima Kasih", "sign_You're Welcome": "Sama-sama", sign_Sorry: "Maaf", "sign_Excuse Me": "Tumpang Lalu", "sign_It's Okay": "Tidak Mengapa", "sign_I am fine": "Saya Khabar Baik", "sign_See you later": "Jumpa Lagi", "sign_Good luck": "Semoga Berjaya", "sign_Good Morning": "Selamat Pagi", "sign_Good Night": "Selamat Malam", "sign_How are you?": "Apa Khabar?", "sign_My name is": "Nama Saya", "sign_Nice to meet you": "Gembira Bertemu",
+    sign_Eat: "Makan", sign_Drink: "Minum", sign_Water: "Air", sign_Food: "Makanan", sign_Mother: "Ibu", sign_Father: "Ayah", sign_Toilet: "Tandas", sign_Tomorrow: "Esok", sign_Later: "Nanti", sign_Need: "Perlu", sign_Go: "Pergi", sign_Brother: "Abang/Adik Lelaki", sign_Sister: "Kakak/Adik Perempuan", sign_Home: "Rumah", sign_Work: "Kerja", sign_School: "Sekolah", sign_Want: "Mahu", sign_Today: "Hari Ini", sign_Now: "Sekarang",
+    sign_Pain: "Sakit (Fizikal)", sign_Sick: "Demam/Sakit", "sign_Call 999": "Hubungi 999", sign_Help: "Tolong (Bantuan)", sign_Danger: "Bahaya", sign_Stop: "Berhenti", sign_Allergy: "Alahan", sign_Doctor: "Doktor", sign_Hospital: "Hospital", sign_Thief: "Pencuri", sign_Lost: "Sesat", sign_Fire: "Api/Kebakaran", "sign_Need Help Now": "Perlu Bantuan Segera", sign_Accident: "Kemalangan", sign_Bleeding: "Berdarah",
+    sign_A: "A", sign_B: "B", sign_C: "C", sign_D: "D", sign_E: "E", sign_F: "F", sign_G: "G", sign_H: "H", sign_I: "I", sign_J: "J", sign_K: "K", sign_L: "L", sign_M: "M", sign_N: "N", sign_O: "O", sign_P: "P", sign_Q: "Q", sign_R: "R", sign_S: "S", sign_T: "T", sign_U: "U", sign_V: "V", sign_W: "W", sign_X: "X", sign_Y: "Y", sign_Z: "Z"
   },
   en: {
     splash_sub: "Welcome to Bimgo", auth_title: "Welcome", auth_sub: "Learn Malaysian Sign Language with AI.",
@@ -31,7 +43,19 @@ const i18n = {
     stat_totalxp: "Total XP Earned", stat_lvldone: "levels completed", you: "You",
     err_mismatch: "⚠️ Passwords do not match!", err_exists: "⚠️ Email already exists!", err_notfound: "❌ Account not found.", err_wrongpass: "❌ Incorrect password.", err_req: "Name required!",
     auth_loading: "Loading...", res_acc: "Average Accuracy",
-    quiz_title: "Mastery Quiz", quiz_q: "Select the correct answer:", quiz_pass: "Quiz Passed!", quiz_fail: "Not Passed", quiz_req: "Need at least 6/8 to pass.", quiz_score: "Quiz Score"
+    quiz_title: "Mastery Quiz", quiz_q: "Select the correct answer:", quiz_pass: "Quiz Passed!", quiz_fail: "Not Passed", quiz_req: "Need at least 6/8 to pass.", quiz_score: "Quiz Score",
+    
+    // LEVEL TITLES (ENGLISH)
+    lvl_lettersA_E: "Letters A – E", lvl_lettersF_J: "Letters F – J", lvl_lettersK_O: "Letters K – O", lvl_lettersP_T: "Letters P – T", lvl_lettersU_Z: "Letters U – Z", lvl_quiz: "Mastery Quiz",
+    lvl_quick_greet: "Quick Greetings", lvl_polite: "Politeness", lvl_well_wish: "Well Wishes", lvl_time_day: "Time of Day", lvl_intro: "Introductions",
+    lvl_basic_needs: "Basic Needs", lvl_core_fam: "Core Family", lvl_time_act: "Time & Actions", lvl_ext_fam: "Extended Family", lvl_pres_act: "Present Actions",
+    lvl_first_resp: "First Response", lvl_imm_alert: "Immediate Alerts", lvl_med_haz: "Medical & Hazards", lvl_sec_safe: "Security & Safety", lvl_sev_sit: "Severe Situations",
+    
+    // SIGN NAMES (ENGLISH)
+    sign_Hello: "Hello", sign_Bye: "Bye", sign_Please: "Please", "sign_Thank you": "Thank you", "sign_You're Welcome": "You're Welcome", sign_Sorry: "Sorry", "sign_Excuse Me": "Excuse Me", "sign_It's Okay": "It's Okay", "sign_I am fine": "I am fine", "sign_See you later": "See you later", "sign_Good luck": "Good luck", "sign_Good Morning": "Good Morning", "sign_Good Night": "Good Night", "sign_How are you?": "How are you?", "sign_My name is": "My name is", "sign_Nice to meet you": "Nice to meet you",
+    sign_Eat: "Eat", sign_Drink: "Drink", sign_Water: "Water", sign_Food: "Food", sign_Mother: "Mother", sign_Father: "Father", sign_Toilet: "Toilet", sign_Tomorrow: "Tomorrow", sign_Later: "Later", sign_Need: "Need", sign_Go: "Go", sign_Brother: "Brother", sign_Sister: "Sister", sign_Home: "Home", sign_Work: "Work", sign_School: "School", sign_Want: "Want", sign_Today: "Today", sign_Now: "Now",
+    sign_Pain: "Pain", sign_Sick: "Sick", "sign_Call 999": "Call 999", sign_Help: "Help", sign_Danger: "Danger", sign_Stop: "Stop", sign_Allergy: "Allergy", sign_Doctor: "Doctor", sign_Hospital: "Hospital", sign_Thief: "Thief", sign_Lost: "Lost", sign_Fire: "Fire", "sign_Need Help Now": "Need Help Now", sign_Accident: "Accident", sign_Bleeding: "Bleeding",
+    sign_A: "A", sign_B: "B", sign_C: "C", sign_D: "D", sign_E: "E", sign_F: "F", sign_G: "G", sign_H: "H", sign_I: "I", sign_J: "J", sign_K: "K", sign_L: "L", sign_M: "M", sign_N: "N", sign_O: "O", sign_P: "P", sign_Q: "Q", sign_R: "R", sign_S: "S", sign_T: "T", sign_U: "U", sign_V: "V", sign_W: "W", sign_X: "X", sign_Y: "Y", sign_Z: "Z"
   }
 };
 
@@ -39,45 +63,45 @@ const CHAPTERS = [
   {
     id: 1, dictKey: "ch1", subtitle: "A-Z", icon: "🔤", color: "#4CAF50",
     levels: [
-      { id: "1-1", title: "Letters A – E", signs: ["A", "B", "C", "D", "E"], xp: 500, gifSrc: "" },
-      { id: "1-2", title: "Letters F – J", signs: ["F", "G", "H", "I", "J"], xp: 500, gifSrc: "" },
-      { id: "1-3", title: "Letters K – O", signs: ["K", "L", "M", "N", "O"], xp: 500, gifSrc: "" },
-      { id: "1-4", title: "Letters P – T", signs: ["P", "Q", "R", "S", "T"], xp: 500, gifSrc: "" },
-      { id: "1-5", title: "Letters U – Z", signs: ["U", "V", "W", "X", "Y", "Z"], xp: 500, gifSrc: "" },
-      { id: "1-q", title: "Mastery Quiz", isQuiz: true, xp: 1000 }
+      { id: "1-1", dictKey: "lvl_lettersA_E", signs: ["A", "B", "C", "D", "E"], xp: 500 },
+      { id: "1-2", dictKey: "lvl_lettersF_J", signs: ["F", "G", "H", "I", "J"], xp: 500 },
+      { id: "1-3", dictKey: "lvl_lettersK_O", signs: ["K", "L", "M", "N", "O"], xp: 500 },
+      { id: "1-4", dictKey: "lvl_lettersP_T", signs: ["P", "Q", "R", "S", "T"], xp: 500 },
+      { id: "1-5", dictKey: "lvl_lettersU_Z", signs: ["U", "V", "W", "X", "Y", "Z"], xp: 500 },
+      { id: "1-q", dictKey: "lvl_quiz", isQuiz: true, xp: 1000 }
     ]
   },
   {
     id: 2, dictKey: "ch2", subtitle: "Greetings", icon: "👋", color: "#2196F3",
-  levels: [
-      { id: "2-1", title: "The Basics", signs: ["Hello", "Bye"], xp: 500, gifSrc: "" },
-      { id: "2-2", title: "Politeness", signs: ["Thank you", "You're Welcome"], xp: 500, gifSrc: "" },
-      { id: "2-3", title: "Apologies", signs: ["Sorry", "Excuse Me", "It's Okay"], xp: 500, gifSrc: "" },
-      { id: "2-4", title: "Introductions", signs: ["My name is", "How are you?", "I am fine"], xp: 500, gifSrc: "" },
-      { id: "2-5", title: "Farewells & Well Wish", signs: ["See you later", "Nice to meet you", "Good luck"], xp: 500, gifSrc: "" },
-      { id: "2-q", title: "Mastery Quiz", isQuiz: true, xp: 1000 }
+    levels: [
+      { id: "2-1", dictKey: "lvl_quick_greet", signs: ["Hello", "I am fine", "See you later"], xp: 500 },
+      { id: "2-2", dictKey: "lvl_polite", signs: ["Please", "Thank you", "You're Welcome", "Sorry"], xp: 500 },
+      { id: "2-3", dictKey: "lvl_well_wish", signs: ["Good luck", "Excuse Me", "It's Okay"], xp: 500 },
+      { id: "2-4", dictKey: "lvl_time_day", signs: ["Good Morning", "Good Night", "How are you?"], xp: 500 },
+      { id: "2-5", dictKey: "lvl_intro", signs: ["My name is", "Nice to meet you"], xp: 500 },
+      { id: "2-q", dictKey: "lvl_quiz", isQuiz: true, xp: 1000 }
     ]
   },
   {
     id: 3, dictKey: "ch3", subtitle: "Daily Life", icon: "🏠", color: "#FF9800",
     levels: [
-      { id: "3-1", title: "Core Family", signs: ["Mother", "Father", "Brother", "Sister"], xp: 500, gifSrc: "" },
-      { id: "3-2", title: "Basic Needs", signs: ["Eat", "Drink", "Water", "Food"], xp: 500, gifSrc: "" },
-      { id: "3-3", title: "Locations", signs: ["Home", "Work", "School", "Toilet"], xp: 500, gifSrc: "" },
-      { id: "3-4", title: "Common Action", signs: ["Go", "Stop", "Want", "Need"], xp: 500, gifSrc: "" },
-      { id: "3-5", title: "Time & Routine", signs: ["Today", "Tomorrow", "Now", "Later"], xp: 500, gifSrc: "" },
-      { id: "3-q", title: "Mastery Quiz", isQuiz: true, xp: 1000 }
+      { id: "3-1", dictKey: "lvl_basic_needs", signs: ["Eat", "Drink", "Water", "Food"], xp: 500 },
+      { id: "3-2", dictKey: "lvl_core_fam", signs: ["Mother", "Father", "Toilet"], xp: 500 },
+      { id: "3-3", dictKey: "lvl_time_act", signs: ["Tomorrow", "Later", "Need", "Go"], xp: 500 },
+      { id: "3-4", dictKey: "lvl_ext_fam", signs: ["Brother", "Sister", "Home"], xp: 500 },
+      { id: "3-5", dictKey: "lvl_pres_act", signs: ["Work", "School", "Want", "Today", "Now"], xp: 500 },
+      { id: "3-q", dictKey: "lvl_quiz", isQuiz: true, xp: 1000 }
     ]
   },
   {
     id: 4, dictKey: "ch4", subtitle: "Emergency", icon: "🆘", color: "#F44336",
     levels: [
-      { id: "4-1", title: "Immediate Alerts", signs: ["Help", "Stop", "Danger"], xp: 500, gifSrc: "" },
-      { id: "4-2", title: "Medical Needs", signs: ["Pain", "Sick", "Hospital", "Doctor"], xp: 500, gifSrc: "" },
-      { id: "4-3", title: "Security & Safety", signs: ["Police", "Thief", "Lost"], xp: 500, gifSrc: "" },
-      { id: "4-4", title: "Urgent Action", signs: ["Call 999", "Need Help Now"], xp: 500, gifSrc: "" },
-      { id: "4-5", title: "Specific Hazards", signs: ["Fire", "Accident", "Bleeding", "Allergy"], xp: 500, gifSrc: "" },
-      { id: "4-q", title: "Mastery Quiz", isQuiz: true, xp: 1000 }
+      { id: "4-1", dictKey: "lvl_first_resp", signs: ["Pain", "Sick", "Call 999"], xp: 500 },
+      { id: "4-2", dictKey: "lvl_imm_alert", signs: ["Help", "Danger", "Stop"], xp: 500 },
+      { id: "4-3", dictKey: "lvl_med_haz", signs: ["Allergy", "Doctor", "Hospital"], xp: 500 },
+      { id: "4-4", dictKey: "lvl_sec_safe", signs: ["Police", "Thief", "Lost", "Fire"], xp: 500 },
+      { id: "4-5", dictKey: "lvl_sev_sit", signs: ["Need Help Now", "Accident", "Bleeding"], xp: 500 },
+      { id: "4-q", dictKey: "lvl_quiz", isQuiz: true, xp: 1000 }
     ]
   }
 ];

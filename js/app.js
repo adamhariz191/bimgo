@@ -54,14 +54,16 @@ function renderHome(){
   document.getElementById("home-greeting").textContent=`${profile.avatar} ${profile.username}`; document.getElementById("home-xp").textContent=profile.xp||0; document.getElementById("home-streak").textContent=profile.streak||1; 
   const spentSecs = profile.timeSpent || 0; const goalSecs = (profile.goal || 10) * 60; let mins = Math.floor(spentSecs / 60); let secs = spentSecs % 60; let pct = Math.min((spentSecs / goalSecs) * 100, 100); let displaySecs = secs < 10 ? "0" + secs : secs;
   document.getElementById("home-goal-label").textContent=`${mins}m ${displaySecs}s / ${profile.goal}m`; document.querySelector("#s-home .progress-fill").style.width = `${pct}%`;
-  document.getElementById("chapter-grid").innerHTML=CHAPTERS.map((ch,i)=>{ const done=ch.levels.filter(l=>progress[l.id]?.completed).length; const pct=Math.round((done/ch.levels.length)*100); return `<button class="chapter-card" onclick="openChapter(${i})" style="border-color:${ch.color}44;background:${ch.color}18"><div style="font-size:36px;margin-bottom:12px">${ch.icon}</div><div style="font-size:16px;font-weight:900;color:#ffffff;">${t(ch.dictKey)}</div><div style="font-size:12px;color:#9ca3af;margin-bottom:12px">${ch.subtitle}</div><div class="progress-bar"><div class="progress-fill" style="background:${ch.color};width:${pct}%"></div></div></button>`; }).join("");
+  document.getElementById("chapter-grid").innerHTML=CHAPTERS.map((ch,i)=>{ const done=ch.levels.filter(l=>progress[l.id]?.completed).length; const pct=Math.round((done/ch.levels.length)*100); return `<button class="chapter-card" onclick="openChapter(${i})" style="border-color:${ch.color}44;background:${ch.color}18"><div style="font-size:36px;margin-bottom:12px">${ch.icon}</div><div style="font-size:16px;font-weight:900;color:#ffffff;">${t(ch.dictKey)}</div><div style="font-size:12px;color:#9ca3af;margin-bottom:12px">${t(ch.dictKey)}</div><div class="progress-bar"><div class="progress-fill" style="background:${ch.color};width:${pct}%"></div></div></button>`; }).join("");
 }
 
 function openChapter(ci){
   currentChapter=CHAPTERS[ci]; document.getElementById("ch-title").textContent=t(currentChapter.dictKey); document.getElementById("ch-icon").textContent=currentChapter.icon;
   document.getElementById("level-list").innerHTML=currentChapter.levels.map((lv,li)=>{
     const done = progress[lv.id]?.completed; const unlocked = li===0 || progress[currentChapter.levels[li-1].id]?.completed;
-    let levelIcon = lv.isQuiz ? "📝" : (done ? "✅" : li+1); let levelTitle = lv.isQuiz ? t('quiz_title') : lv.title;
+    let levelIcon = lv.isQuiz ? "📝" : (done ? "✅" : li+1); 
+    // UPDATE: Now we pull the Level title from the dictionary!
+    let levelTitle = lv.isQuiz ? t('quiz_title') : t(lv.dictKey);
     return `<div class="level-item ${unlocked? done?'done':'':'locked'}" onclick="${unlocked? `startLevel(${li})`:''}"><div style="width:48px;height:48px;border-radius:16px;background:${done?currentChapter.color:unlocked?"#374151":"#1f2937"};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;">${levelIcon}</div><div style="flex:1; font-weight:900; font-size:16px; color:#fff;">${levelTitle}</div>${unlocked && !done ? '<div style="color:#6b7280; font-size:20px;">▶</div>' : ''}</div>`;
   }).join("");
   showScreen("s-chapter");
@@ -87,15 +89,20 @@ function startQuiz() {
 
 function renderQuizQuestion() {
     let q = quizQuestions[currentQuizIdx]; document.getElementById('quiz-progress-text').textContent = `${currentQuizIdx + 1}/8`;
-    document.getElementById('quiz-gif').src = `https://via.placeholder.com/400x300/111c11/4CAF50?text=Sign:+` + encodeURIComponent(q.correct);
+    // UPDATE: We translate the "Sign:" text and the actual correct sign name for the placeholder image!
+    document.getElementById('quiz-gif').src = `https://via.placeholder.com/400x300/111c11/4CAF50?text=Sign:+` + encodeURIComponent(t("sign_" + q.correct));
     let grid = document.getElementById('quiz-options');
-    grid.innerHTML = q.options.map(opt => `<button class="quiz-btn" onclick="handleQuizAnswer(this, '${opt}', '${q.correct}')">${opt}</button>`).join('');
+    // UPDATE: We display the translated sign on the buttons, but keep the English logic for the handleQuizAnswer function!
+    grid.innerHTML = q.options.map(opt => `<button class="quiz-btn" onclick="handleQuizAnswer(this, '${opt}', '${q.correct}')">${t("sign_" + opt)}</button>`).join('');
 }
 
 function handleQuizAnswer(btn, selected, correct) {
     document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
     if (selected === correct) { btn.style.background = "#4CAF50"; btn.style.borderColor = "#4CAF50"; quizScore++; } 
-    else { btn.style.background = "#F44336"; btn.style.borderColor = "#F44336"; document.querySelectorAll('.quiz-btn').forEach(b => { if(b.textContent === correct) { b.style.background = "#4CAF50"; b.style.borderColor = "#4CAF50"; } }); }
+    else { btn.style.background = "#F44336"; btn.style.borderColor = "#F44336"; document.querySelectorAll('.quiz-btn').forEach(b => { 
+        // We compare against the translated text now since that is what's on the button!
+        if(b.textContent === t("sign_" + correct)) { b.style.background = "#4CAF50"; b.style.borderColor = "#4CAF50"; } 
+    }); }
     setTimeout(() => { currentQuizIdx++; if(currentQuizIdx < 8) { renderQuizQuestion(); } else { finishQuiz(); } }, 1200);
 }
 
@@ -117,9 +124,11 @@ function finishQuiz() {
 
 function renderLessonView() {
   const sign = allLessonSigns[currentSignIdx];
-  document.getElementById("lesson-breadcrumb").textContent=`${t(currentChapter.dictKey)} · ${currentLevel.title}`;
+  // UPDATE: We translate the Level title!
+  document.getElementById("lesson-breadcrumb").textContent=`${t(currentChapter.dictKey)} · ${t(currentLevel.dictKey)}`;
   document.getElementById("lesson-progress-text").textContent=`${currentSignIdx + 1}/${allLessonSigns.length}`;
-  document.getElementById("vid-sign-name").textContent=sign;
+  // UPDATE: We translate the Sign Name!
+  document.getElementById("vid-sign-name").textContent=t("sign_" + sign);
   document.getElementById("t-les-link").href=signBankUrl(sign);
   
   const mediaUrl = SIGN_MEDIA[sign] || "https://via.placeholder.com/400x300/111c11/4CAF50?text=Tiada+Media"; 
