@@ -74,7 +74,7 @@ const CHAPTERS = [
   {
     id: 2, dictKey: "ch2", subtitle: "Greetings", icon: "👋", color: "#2196F3",
     levels: [
-      { id: "2-1", dictKey: "lvl_quick_greet", signs: ["Hello", "I am fine", "See you later"], xp: 500 },
+      { id: "2-1", dictKey: "lvl_quick_greet", signs: ["Hello", "Good Bye"], xp: 500 },
       { id: "2-2", dictKey: "lvl_polite", signs: ["Please", "Thank you", "You're Welcome", "Sorry"], xp: 500 },
       { id: "2-3", dictKey: "lvl_well_wish", signs: ["Good luck", "Excuse Me", "It's Okay"], xp: 500 },
       { id: "2-4", dictKey: "lvl_time_day", signs: ["Good Morning", "Good Night", "How are you?"], xp: 500 },
