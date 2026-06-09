@@ -741,6 +741,47 @@ case "Understand": {
             s = score;
             break;
         }
+        case "Eat":
+        case "Makan": {
+    let score = 0;
+
+    // Hand shape: all fingertips pinched/bunched together toward thumb
+    // Check all fingers are curled/low (not extended up)
+    if (!idxUp) score += 15;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
+
+    // All fingertips should be close together (pinched) near thumb tip
+    // lm[4]=thumb tip, lm[8]=index tip, lm[12]=mid tip, lm[16]=ring tip, lm[20]=pinky tip
+    let thumbToIndex = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
+    let thumbToMid   = Math.hypot(lm[4].x - lm[12].x, lm[4].y - lm[12].y);
+    let thumbToRing  = Math.hypot(lm[4].x - lm[16].x, lm[4].y - lm[16].y);
+
+    // Fingertips should all be close to thumb = pinched/bunched shape
+    if (thumbToIndex < 0.12) score += 10;
+    if (thumbToMid   < 0.15) score += 5;
+    if (thumbToRing  < 0.18) score += 5;
+
+    // Movement: hand raises upward toward mouth (wrist Y decreases = moves up on screen)
+    if (wristHistory.length > 10) {
+        // Hand must be raised (near face/mouth level)
+        let currentWristY = lm[0].y;
+        if (currentWristY < 0.55) score += 10; // hand is in upper half of frame
+
+        // Upward movement toward mouth
+        let recentSlice = wristHistory.slice(-10);
+        let firstY = recentSlice[0].y;
+        let lastY  = recentSlice[recentSlice.length - 1].y;
+        let deltaY = firstY - lastY; // positive = moved upward
+
+        if (deltaY > 0.03) score += 10; // moving upward
+        if (deltaY > 0.07) score += 10; // strong upward motion toward mouth
+    }
+
+    s = score;
+    break;
+}
         
         // Static Alphabet Signs (Unchanged)
         case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
