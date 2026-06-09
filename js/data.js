@@ -111,7 +111,7 @@ const CHAPTERS = [
 
 const SIGN_MEDIA = {
     "Hello": "./assets/Hello.mp4",
-    "Goodbye": "./assets/Goodbye.mp4",
+    "Goodbye": "./assets/Good Bye.mp4",
     "Friend": "./assets/Friend.mp4",
     "Please": "./assets/Please.mp4",
     "Thank you": "./assets/Thank you.mp4",
