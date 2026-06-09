@@ -531,6 +531,127 @@ function getGestureScore(sign, lm) {
             }
             break;
         }
+        case "Friend": {
+    // BIM: Two hands with index fingers hooked/linked together
+    // Hand shape: Both index fingers extended, others curled, hands brought together
+    let score = 0;
+
+    // Index finger up, others curled (hook shape)
+    if (idxUp) score += 25;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
+
+    // Index finger tip should be near the middle knuckle area (hooked, not fully straight)
+    // lm[8] = index tip, lm[6] = index PIP joint — if tip is only slightly above PIP, it's bent/hooked
+    let indexBentAmount = lm[6].y - lm[8].y; // small positive = slightly up (hooked)
+    if (indexBentAmount > 0.01 && indexBentAmount < 0.08) score += 30; // hooked position
+
+    s = score;
+    break;
+}
+
+case "Yes": {
+    // BIM: Fist with thumb tucked, nod hand up and down
+    let score = 0;
+
+    // All fingers curled into a fist
+    let isFist = !idxUp && !midUp && !rngUp && !pnkUp;
+    if (isFist) score += 40;
+
+    // Thumb should be tucked (thumb tip below index base)
+    let thumbTucked = lm[4].y > lm[5].y;
+    if (thumbTucked) score += 20;
+
+    // Vertical nodding movement (up-down oscillation)
+    if (isFist && wristHistory.length > 15) {
+        let totalVerticalMovement = 0;
+        let vertDirChanges = 0;
+        let lastVertDir = null;
+
+        for (let i = 1; i < wristHistory.length; i++) {
+            const dy = wristHistory[i].y - wristHistory[i - 1].y;
+            totalVerticalMovement += Math.abs(dy);
+
+            let vertDir = dy > 0.005 ? 'down' : dy < -0.005 ? 'up' : null;
+            if (vertDir && lastVertDir && vertDir !== lastVertDir) vertDirChanges++;
+            if (vertDir) lastVertDir = vertDir;
+        }
+
+        // Must have clear vertical movement with at least 1 direction change (nod)
+        if (totalVerticalMovement > 0.08) score += 20;
+        if (totalVerticalMovement > 0.15) score += 10;
+        if (vertDirChanges >= 1) score += 10; // at least one nod cycle
+    }
+
+    s = score;
+    break;
+}
+
+case "No": {
+    // BIM: Index finger extended, wave side to side (horizontal shake)
+    let score = 0;
+
+    // Index finger up, others curled
+    if (idxUp) score += 25;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
+
+    // Horizontal side-to-side shaking movement
+    if (idxUp && wristHistory.length > 15) {
+        let totalHorizontalMovement = 0;
+        let horizDirChanges = 0;
+        let lastHorizDir = null;
+
+        for (let i = 1; i < wristHistory.length; i++) {
+            const dx = wristHistory[i].x - wristHistory[i - 1].x;
+            totalHorizontalMovement += Math.abs(dx);
+
+            let horizDir = dx > 0.005 ? 'right' : dx < -0.005 ? 'left' : null;
+            if (horizDir && lastHorizDir && horizDir !== lastHorizDir) horizDirChanges++;
+            if (horizDir) lastHorizDir = horizDir;
+        }
+
+        // Must have clear horizontal movement with direction changes (shake)
+        if (totalHorizontalMovement > 0.06) score += 15;
+        if (horizDirChanges >= 1) score += 15; // at least one shake cycle
+        if (horizDirChanges >= 2) score += 15; // stronger shake = more confident
+    }
+
+    s = score;
+    break;
+}
+
+case "Understand": {
+    // BIM: Index finger points to temple/forehead, then flicks upward/forward
+    let score = 0;
+
+    // Index finger extended, others curled (pointing shape)
+    if (idxUp) score += 25;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
+
+    // Hand should be raised (near head level) — wrist Y should be relatively high on screen
+    // In MediaPipe, lower Y value = higher on screen
+    let wristY = lm[0].y;
+    if (wristY < 0.55) score += 15; // hand raised up
+
+    // Flick movement: short upward or forward motion after holding near face
+    if (idxUp && wristHistory.length > 10) {
+        let recentSlice = wristHistory.slice(-10);
+        let firstY = recentSlice[0].y;
+        let lastY = recentSlice[recentSlice.length - 1].y;
+        let deltaY = firstY - lastY; // positive = moved upward on screen
+
+        if (deltaY > 0.04) score += 15; // upward flick detected
+        if (deltaY > 0.08) score += 15; // strong flick
+    }
+
+    s = score;
+    break;
+}
         
         case "Thank you": 
         case "You're Welcome": {
