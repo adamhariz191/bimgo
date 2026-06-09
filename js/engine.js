@@ -1,10 +1,3 @@
-
-let wristHistory = [];
-let holdInterval = null;
-let holdTimer = 0;
-let currentScore = 0;
-let sessionAccuracies = [];
-
 let movementData = {
     totalDistance: 0,
     xDistance: 0,
