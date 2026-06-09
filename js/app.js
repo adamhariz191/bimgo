@@ -149,9 +149,3 @@ function nextLessonOrFinish() {
       showScreen('s-home');
   }
 }
-
-function openCameraChallenge() {
-    const currentSign = allLessonSigns[currentSignIdx];
-    document.getElementById("cam-target-sign").textContent = t("sign_" + currentSign);
-    showScreen('s-camera');
-}

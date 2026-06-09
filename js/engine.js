@@ -317,7 +317,12 @@ function getMovementStats() {
 
 function openCameraChallenge(){
     const sign = allLessonSigns[currentSignIdx];
-    document.getElementById("cam-target-sign").textContent = sign;
+    
+    // Displays the translated word to the user, but hides the English ID for the AI to read
+    const targetElement = document.getElementById("cam-target-sign");
+    targetElement.textContent = t("sign_" + sign); 
+    targetElement.dataset.signId = sign; 
+
     document.getElementById("cam-start-btn").style.display = "block"; 
     document.getElementById("cam-submit-btn").style.display = "none";
     document.getElementById("cam-status").textContent = t('cam_load'); 
