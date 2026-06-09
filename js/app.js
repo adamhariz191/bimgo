@@ -62,7 +62,6 @@ function openChapter(ci){
   document.getElementById("level-list").innerHTML=currentChapter.levels.map((lv,li)=>{
     const done = progress[lv.id]?.completed; const unlocked = li===0 || progress[currentChapter.levels[li-1].id]?.completed;
     let levelIcon = lv.isQuiz ? "📝" : (done ? "✅" : li+1); 
-    // UPDATE: Now we pull the Level title from the dictionary!
     let levelTitle = lv.isQuiz ? t('quiz_title') : t(lv.dictKey);
     return `<div class="level-item ${unlocked? done?'done':'':'locked'}" onclick="${unlocked? `startLevel(${li})`:''}"><div style="width:48px;height:48px;border-radius:16px;background:${done?currentChapter.color:unlocked?"#374151":"#1f2937"};display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;">${levelIcon}</div><div style="flex:1; font-weight:900; font-size:16px; color:#fff;">${levelTitle}</div>${unlocked && !done ? '<div style="color:#6b7280; font-size:20px;">▶</div>' : ''}</div>`;
   }).join("");
@@ -89,10 +88,8 @@ function startQuiz() {
 
 function renderQuizQuestion() {
     let q = quizQuestions[currentQuizIdx]; document.getElementById('quiz-progress-text').textContent = `${currentQuizIdx + 1}/8`;
-    // UPDATE: We translate the "Sign:" text and the actual correct sign name for the placeholder image!
     document.getElementById('quiz-gif').src = `https://via.placeholder.com/400x300/111c11/4CAF50?text=Sign:+` + encodeURIComponent(t("sign_" + q.correct));
     let grid = document.getElementById('quiz-options');
-    // UPDATE: We display the translated sign on the buttons, but keep the English logic for the handleQuizAnswer function!
     grid.innerHTML = q.options.map(opt => `<button class="quiz-btn" onclick="handleQuizAnswer(this, '${opt}', '${q.correct}')">${t("sign_" + opt)}</button>`).join('');
 }
 
@@ -100,7 +97,6 @@ function handleQuizAnswer(btn, selected, correct) {
     document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
     if (selected === correct) { btn.style.background = "#4CAF50"; btn.style.borderColor = "#4CAF50"; quizScore++; } 
     else { btn.style.background = "#F44336"; btn.style.borderColor = "#F44336"; document.querySelectorAll('.quiz-btn').forEach(b => { 
-        // We compare against the translated text now since that is what's on the button!
         if(b.textContent === t("sign_" + correct)) { b.style.background = "#4CAF50"; b.style.borderColor = "#4CAF50"; } 
     }); }
     setTimeout(() => { currentQuizIdx++; if(currentQuizIdx < 8) { renderQuizQuestion(); } else { finishQuiz(); } }, 1200);
@@ -124,10 +120,8 @@ function finishQuiz() {
 
 function renderLessonView() {
   const sign = allLessonSigns[currentSignIdx];
-  // UPDATE: We translate the Level title!
   document.getElementById("lesson-breadcrumb").textContent=`${t(currentChapter.dictKey)} · ${t(currentLevel.dictKey)}`;
   document.getElementById("lesson-progress-text").textContent=`${currentSignIdx + 1}/${allLessonSigns.length}`;
-  // UPDATE: We translate the Sign Name!
   document.getElementById("vid-sign-name").textContent=t("sign_" + sign);
   document.getElementById("t-les-link").href=signBankUrl(sign);
   

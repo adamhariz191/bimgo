@@ -1,3 +1,6 @@
+// ==========================================
+// TRANSLATION DICTIONARY (i18n)
+// ==========================================
 const i18n = {
   ms: {
     splash_sub: "Selamat datang ke Bimgo", auth_title: "Selamat Datang", auth_sub: "Belajar Bahasa Isyarat Malaysia dengan AI.",
@@ -6,7 +9,7 @@ const i18n = {
     log_title: "Log Masuk", wb_title: "Selamat kembali,", home_welcome: "Selamat datang,", home_target: "Sasaran Harian", home_ch_title: "Bab Pembelajaran",
     nav_home: "Utama", nav_prof: "Profil", prof_title: "Profil Saya", prof_edit_btn: "✏️ Sunting Profil", tab_stat: "📊 Statistik", tab_badge: "🏅 Lencana", tab_rank: "🏆 Ranking", prof_logout: "Log Keluar",
     edit_title: "Sunting Profil", edit_lbl1: "Nama Pengguna", edit_lbl2: "Pilih Avatar Baru", edit_lbl3: "Pilih Bahasa", edit_save: "Simpan Perubahan ✅",
-    ch1: "Abjad", ch2: "Salam", ch3: "Kehidupan", ch4: "Kecemasan",
+    ch1: "Abjad", ch2: "Sapaan", ch3: "Kehidupan Harian", ch4: "Kecemasan",
     les_theory: "Sesi Pembelajaran", les_watch: "Tonton demonstrasi di bawah.", les_visual: "Demonstrasi Visual", les_link: "Semak di BIM Sign Bank", les_cam: "Cuba Kamera AI 📷",
     cam_title: "Cabaran AI", cam_show: "Tunjukkan:", cam_acc: "Ketepatan Semasa", cam_open: "📷 Buka Kamera", cam_submit: "Hantar Jawapan", cam_ready: "Sila tunjukkan tangan...", cam_load: "Memuatkan AI...",
     cam_correct: "✅ Bentuk Tepat! Anda boleh hantar.", cam_wrong: "❌ Bentuk Belum Tepat. Betulkan kedudukan.", res_congrats: "Tahniah!", res_correct: "Tanda berjaya direkodkan.", res_lvldone: "Tahap selesai. +XP Ditambah!",
@@ -18,14 +21,14 @@ const i18n = {
     
     // LEVEL TITLES (MALAY)
     lvl_lettersA_E: "Huruf A – E", lvl_lettersF_J: "Huruf F – J", lvl_lettersK_O: "Huruf K – O", lvl_lettersP_T: "Huruf P – T", lvl_lettersU_Z: "Huruf U – Z", lvl_quiz: "Kuiz Kemahiran",
-    lvl_quick_greet: "Sapaan Pantas", lvl_polite: "Kesopanan", lvl_well_wish: "Ucapan Baik", lvl_time_day: "Masa", lvl_intro: "Pengenalan Diri",
-    lvl_basic_needs: "Keperluan Asas", lvl_core_fam: "Keluarga Asas", lvl_time_act: "Masa & Tindakan", lvl_ext_fam: "Keluarga Besar", lvl_pres_act: "Tindakan Semasa",
-    lvl_first_resp: "Tindak Balas Awal", lvl_imm_alert: "Amaran Segera", lvl_med_haz: "Perubatan & Bahaya", lvl_sec_safe: "Keselamatan", lvl_sev_sit: "Situasi Cemas",
+    lvl_quick_greet: "Sapaan Ringkas", lvl_polite: "Kesopanan", lvl_basic_ans: "Jawapan Asas", lvl_time_day: "Waktu Hari", lvl_intro: "Pengenalan",
+    lvl_basic_needs: "Keperluan Asas", lvl_core_fam: "Keluarga Asas", lvl_time_act: "Masa & Tindakan", lvl_ext_fam: "Keluarga Tambahan", lvl_pres_act: "Tindakan Semasa",
+    lvl_first_resp: "Tindak Balas Awal", lvl_imm_alert: "Amaran Segera", lvl_med_haz: "Perubatan & Bahaya", lvl_sec_safe: "Keselamatan", lvl_sev_sit: "Situasi Serius",
     
     // SIGN NAMES (MALAY)
-    sign_Hello: "Helo", sign_Bye: "Selamat Tinggal", sign_Please: "Tolong (Minta)", "sign_Thank you": "Terima Kasih", "sign_You're Welcome": "Sama-sama", sign_Sorry: "Maaf", "sign_Excuse Me": "Tumpang Lalu", "sign_It's Okay": "Tidak Mengapa", "sign_I am fine": "Saya Khabar Baik", "sign_See you later": "Jumpa Lagi", "sign_Good luck": "Semoga Berjaya", "sign_Good Morning": "Selamat Pagi", "sign_Good Night": "Selamat Malam", "sign_How are you?": "Apa Khabar?", "sign_My name is": "Nama Saya", "sign_Nice to meet you": "Gembira Bertemu",
-    sign_Eat: "Makan", sign_Drink: "Minum", sign_Water: "Air", sign_Food: "Makanan", sign_Mother: "Ibu", sign_Father: "Ayah", sign_Toilet: "Tandas", sign_Tomorrow: "Esok", sign_Later: "Nanti", sign_Need: "Perlu", sign_Go: "Pergi", sign_Brother: "Abang/Adik Lelaki", sign_Sister: "Kakak/Adik Perempuan", sign_Home: "Rumah", sign_Work: "Kerja", sign_School: "Sekolah", sign_Want: "Mahu", sign_Today: "Hari Ini", sign_Now: "Sekarang",
-    sign_Pain: "Sakit (Fizikal)", sign_Sick: "Demam/Sakit", "sign_Call 999": "Hubungi 999", sign_Help: "Tolong (Bantuan)", sign_Danger: "Bahaya", sign_Stop: "Berhenti", sign_Allergy: "Alahan", sign_Doctor: "Doktor", sign_Hospital: "Hospital", sign_Thief: "Pencuri", sign_Lost: "Sesat", sign_Fire: "Api/Kebakaran", "sign_Need Help Now": "Perlu Bantuan Segera", sign_Accident: "Kemalangan", sign_Bleeding: "Berdarah",
+    sign_Hello: "Helo", sign_Goodbye: "Selamat Tinggal", sign_Friend: "Kawan", sign_Please: "Tolong/Sila", "sign_Thank you": "Terima Kasih", "sign_You're Welcome": "Sama-sama", sign_Sorry: "Maaf", sign_Yes: "Ya", sign_No: "Tidak", sign_Understand: "Faham", "sign_Good Morning": "Selamat Pagi", "sign_Good Night": "Selamat Malam", "sign_How are you?": "Apa Khabar?", sign_Me: "Saya", sign_You: "Awak", sign_Name: "Nama",
+    sign_Eat: "Makan", sign_Drink: "Minum", sign_Water: "Air", sign_Food: "Makanan", sign_Mother: "Ibu", sign_Father: "Bapa", sign_Tomorrow: "Esok", sign_Need: "Perlu", sign_Go: "Pergi", sign_Brother: "Abang/Adik Lelaki", sign_Sister: "Kakak/Adik Perempuan", sign_Home: "Rumah", sign_Work: "Kerja", sign_School: "Sekolah", sign_Want: "Mahu", sign_Now: "Sekarang",
+    sign_Pain: "Sakit", sign_Sick: "Demam/Sakit", sign_Medicine: "Ubat", sign_Dizzy: "Pening", sign_Help: "Tolong", sign_Danger: "Bahaya", sign_Stop: "Berhenti", sign_Doctor: "Doktor", sign_Hospital: "Hospital", sign_Nurse: "Jururawat", sign_Police: "Polis", sign_Thief: "Pencuri", sign_Fire: "Kebakaran", sign_Accident: "Kemalangan", sign_Ambulance: "Ambulans", sign_Emergency: "Kecemasan",
     sign_A: "A", sign_B: "B", sign_C: "C", sign_D: "D", sign_E: "E", sign_F: "F", sign_G: "G", sign_H: "H", sign_I: "I", sign_J: "J", sign_K: "K", sign_L: "L", sign_M: "M", sign_N: "N", sign_O: "O", sign_P: "P", sign_Q: "Q", sign_R: "R", sign_S: "S", sign_T: "T", sign_U: "U", sign_V: "V", sign_W: "W", sign_X: "X", sign_Y: "Y", sign_Z: "Z"
   },
   en: {
@@ -47,14 +50,14 @@ const i18n = {
     
     // LEVEL TITLES (ENGLISH)
     lvl_lettersA_E: "Letters A – E", lvl_lettersF_J: "Letters F – J", lvl_lettersK_O: "Letters K – O", lvl_lettersP_T: "Letters P – T", lvl_lettersU_Z: "Letters U – Z", lvl_quiz: "Mastery Quiz",
-    lvl_quick_greet: "Quick Greetings", lvl_polite: "Politeness", lvl_well_wish: "Well Wishes", lvl_time_day: "Time of Day", lvl_intro: "Introductions",
+    lvl_quick_greet: "Quick Greetings", lvl_polite: "Politeness", lvl_basic_ans: "Basic Answers", lvl_time_day: "Time of Day", lvl_intro: "Introductions",
     lvl_basic_needs: "Basic Needs", lvl_core_fam: "Core Family", lvl_time_act: "Time & Actions", lvl_ext_fam: "Extended Family", lvl_pres_act: "Present Actions",
     lvl_first_resp: "First Response", lvl_imm_alert: "Immediate Alerts", lvl_med_haz: "Medical & Hazards", lvl_sec_safe: "Security & Safety", lvl_sev_sit: "Severe Situations",
     
     // SIGN NAMES (ENGLISH)
-    sign_Hello: "Hello", sign_Bye: "Bye", sign_Please: "Please", "sign_Thank you": "Thank you", "sign_You're Welcome": "You're Welcome", sign_Sorry: "Sorry", "sign_Excuse Me": "Excuse Me", "sign_It's Okay": "It's Okay", "sign_I am fine": "I am fine", "sign_See you later": "See you later", "sign_Good luck": "Good luck", "sign_Good Morning": "Good Morning", "sign_Good Night": "Good Night", "sign_How are you?": "How are you?", "sign_My name is": "My name is", "sign_Nice to meet you": "Nice to meet you",
-    sign_Eat: "Eat", sign_Drink: "Drink", sign_Water: "Water", sign_Food: "Food", sign_Mother: "Mother", sign_Father: "Father", sign_Toilet: "Toilet", sign_Tomorrow: "Tomorrow", sign_Later: "Later", sign_Need: "Need", sign_Go: "Go", sign_Brother: "Brother", sign_Sister: "Sister", sign_Home: "Home", sign_Work: "Work", sign_School: "School", sign_Want: "Want", sign_Today: "Today", sign_Now: "Now",
-    sign_Pain: "Pain", sign_Sick: "Sick", "sign_Call 999": "Call 999", sign_Help: "Help", sign_Danger: "Danger", sign_Stop: "Stop", sign_Allergy: "Allergy", sign_Doctor: "Doctor", sign_Hospital: "Hospital", sign_Thief: "Thief", sign_Lost: "Lost", sign_Fire: "Fire", "sign_Need Help Now": "Need Help Now", sign_Accident: "Accident", sign_Bleeding: "Bleeding",
+    sign_Hello: "Hello", sign_Goodbye: "Goodbye", sign_Friend: "Friend", sign_Please: "Please", "sign_Thank you": "Thank you", "sign_You're Welcome": "You're Welcome", sign_Sorry: "Sorry", sign_Yes: "Yes", sign_No: "No", sign_Understand: "Understand", "sign_Good Morning": "Good Morning", "sign_Good Night": "Good Night", "sign_How are you?": "How are you?", sign_Me: "Me", sign_You: "You", sign_Name: "Name",
+    sign_Eat: "Eat", sign_Drink: "Drink", sign_Water: "Water", sign_Food: "Food", sign_Mother: "Mother", sign_Father: "Father", sign_Tomorrow: "Tomorrow", sign_Need: "Need", sign_Go: "Go", sign_Brother: "Brother", sign_Sister: "Sister", sign_Home: "Home", sign_Work: "Work", sign_School: "School", sign_Want: "Want", sign_Now: "Now",
+    sign_Pain: "Pain", sign_Sick: "Sick", sign_Medicine: "Medicine", sign_Dizzy: "Dizzy", sign_Help: "Help", sign_Danger: "Danger", sign_Stop: "Stop", sign_Doctor: "Doctor", sign_Hospital: "Hospital", sign_Nurse: "Nurse", sign_Police: "Police", sign_Thief: "Thief", sign_Fire: "Fire", sign_Accident: "Accident", sign_Ambulance: "Ambulance", sign_Emergency: "Emergency",
     sign_A: "A", sign_B: "B", sign_C: "C", sign_D: "D", sign_E: "E", sign_F: "F", sign_G: "G", sign_H: "H", sign_I: "I", sign_J: "J", sign_K: "K", sign_L: "L", sign_M: "M", sign_N: "N", sign_O: "O", sign_P: "P", sign_Q: "Q", sign_R: "R", sign_S: "S", sign_T: "T", sign_U: "U", sign_V: "V", sign_W: "W", sign_X: "X", sign_Y: "Y", sign_Z: "Z"
   }
 };
@@ -74,11 +77,11 @@ const CHAPTERS = [
   {
     id: 2, dictKey: "ch2", subtitle: "Greetings", icon: "👋", color: "#2196F3",
     levels: [
-      { id: "2-1", dictKey: "lvl_quick_greet", signs: ["Hello", "Good Bye"], xp: 500 },
+      { id: "2-1", dictKey: "lvl_quick_greet", signs: ["Hello", "Goodbye", "Friend"], xp: 500 },
       { id: "2-2", dictKey: "lvl_polite", signs: ["Please", "Thank you", "You're Welcome", "Sorry"], xp: 500 },
-      { id: "2-3", dictKey: "lvl_well_wish", signs: ["Good luck", "Excuse Me", "It's Okay"], xp: 500 },
+      { id: "2-3", dictKey: "lvl_basic_ans", signs: ["Yes", "No", "Understand"], xp: 500 },
       { id: "2-4", dictKey: "lvl_time_day", signs: ["Good Morning", "Good Night", "How are you?"], xp: 500 },
-      { id: "2-5", dictKey: "lvl_intro", signs: ["My name is", "Nice to meet you"], xp: 500 },
+      { id: "2-5", dictKey: "lvl_intro", signs: ["Me", "You", "Name"], xp: 500 },
       { id: "2-q", dictKey: "lvl_quiz", isQuiz: true, xp: 1000 }
     ]
   },
@@ -87,7 +90,7 @@ const CHAPTERS = [
     levels: [
       { id: "3-1", dictKey: "lvl_basic_needs", signs: ["Eat", "Drink", "Water", "Food"], xp: 500 },
       { id: "3-2", dictKey: "lvl_core_fam", signs: ["Mother", "Father", "Toilet"], xp: 500 },
-      { id: "3-3", dictKey: "lvl_time_act", signs: ["Tomorrow", "Later", "Need", "Go"], xp: 500 },
+      { id: "3-3", dictKey: "lvl_time_act", signs: ["Tomorrow", "Need", "Go"], xp: 500 },
       { id: "3-4", dictKey: "lvl_ext_fam", signs: ["Brother", "Sister", "Home"], xp: 500 },
       { id: "3-5", dictKey: "lvl_pres_act", signs: ["Work", "School", "Want", "Today", "Now"], xp: 500 },
       { id: "3-q", dictKey: "lvl_quiz", isQuiz: true, xp: 1000 }
@@ -96,11 +99,11 @@ const CHAPTERS = [
   {
     id: 4, dictKey: "ch4", subtitle: "Emergency", icon: "🆘", color: "#F44336",
     levels: [
-      { id: "4-1", dictKey: "lvl_first_resp", signs: ["Pain", "Sick", "Call 999"], xp: 500 },
+      { id: "4-1", dictKey: "lvl_first_resp", signs: ["Pain", "Sick", "Medicine", "Dizzy"], xp: 500 },
       { id: "4-2", dictKey: "lvl_imm_alert", signs: ["Help", "Danger", "Stop"], xp: 500 },
-      { id: "4-3", dictKey: "lvl_med_haz", signs: ["Allergy", "Doctor", "Hospital"], xp: 500 },
-      { id: "4-4", dictKey: "lvl_sec_safe", signs: ["Police", "Thief", "Lost", "Fire"], xp: 500 },
-      { id: "4-5", dictKey: "lvl_sev_sit", signs: ["Need Help Now", "Accident", "Bleeding"], xp: 500 },
+      { id: "4-3", dictKey: "lvl_med_haz", signs: ["Doctor", "Hospital", "Nurse"], xp: 500 },
+      { id: "4-4", dictKey: "lvl_sec_safe", signs: ["Police", "Thief", "Fire"], xp: 500 },
+      { id: "4-5", dictKey: "lvl_sev_sit", signs: ["Accident", "Ambulance", "Emergency"], xp: 500 },
       { id: "4-q", dictKey: "lvl_quiz", isQuiz: true, xp: 1000 }
     ]
   }
@@ -108,9 +111,55 @@ const CHAPTERS = [
 
 const SIGN_MEDIA = {
     "Hello": "./assets/Hello.mp4",
-    "Bye": "./assets/Good Bye.mp4",
+    "Goodbye": "./assets/Goodbye.mp4",
+    "Friend": "./assets/Friend.mp4",
+    "Please": "./assets/Please.mp4",
     "Thank you": "./assets/Thank you.mp4",
     "You're Welcome": "./assets/Welcome.mp4",
+    "Sorry": "./assets/Sorry.mp4",
+    "Yes": "./assets/Yes.mp4",
+    "No": "./assets/No.mp4",
+    "Understand": "./assets/Understand.mp4",
+    "Good Morning": "./assets/Good Morning.mp4",
+    "Good Night": "./assets/Good Night.mp4",
+    "How are you?": "./assets/How Are You.mp4",
+    "Me": "./assets/Me.mp4",
+    "You": "./assets/You.mp4",
+    "Name": "./assets/Name.mp4",
+    "Eat": "./assets/Eat.mp4",
+    "Drink": "./assets/Drink.mp4",
+    "Water": "./assets/Water.mp4",
+    "Food": "./assets/Food.mp4",
+    "Mother": "./assets/Mother.mp4",
+    "Father": "./assets/Father.mp4",
+    "Toilet": "./assets/Toilet.mp4",
+    "Tomorrow": "./assets/Tomorrow.mp4",
+    "Need": "./assets/Need.mp4",
+    "Go": "./assets/Go.mp4",
+    "Brother": "./assets/Brother.mp4",
+    "Sister": "./assets/Sister.mp4",
+    "Home": "./assets/Home.mp4",
+    "Work": "./assets/Work.mp4",
+    "School": "./assets/School.mp4",
+    "Want": "./assets/Want.mp4",
+    "Today": "./assets/Today.mp4",
+    "Now": "./assets/Now.mp4",
+    "Pain": "./assets/Pain.mp4",
+    "Sick": "./assets/Sick.mp4",
+    "Medicine": "./assets/Medicine.mp4",
+    "Dizzy": "./assets/Dizzy.mp4",
+    "Help": "./assets/Help.mp4",
+    "Danger": "./assets/Danger.mp4",
+    "Stop": "./assets/Stop.mp4",
+    "Doctor": "./assets/Doctor.mp4",
+    "Hospital": "./assets/Hospital.mp4",
+    "Nurse": "./assets/Nurse.mp4",
+    "Police": "./assets/Police.mp4",
+    "Thief": "./assets/Thief.mp4",
+    "Fire": "./assets/Fire.mp4",
+    "Accident": "./assets/Accident.mp4",
+    "Ambulance": "./assets/Ambulance.mp4",
+    "Emergency": "./assets/Emergency.mp4",
     "A": "./assets/A.mp4",
     "B": "./assets/B.mp4",
     "C": "./assets/C.mp4",
@@ -136,16 +185,7 @@ const SIGN_MEDIA = {
     "W": "./assets/W.mp4",
     "X": "./assets/X.mp4",
     "Y": "./assets/Y.mp4",
-    "Z": "./assets/Z.mp4",
-    "Good Morning": "./assets/Good Morning.mp4",
-    "Good Night": "./assets/Good Night.mp4",
-    "Mother": "./assets/Mother.mp4",
-    "Father": "./assets/Father.mp4",
-    "Brother": "./assets/Brother.mp4",
-    "Sister": "./assets/Sister.mp4",
-    "Help": "./assets/Help.mp4",
-    "Stop": "./assets/Stop.mp4",
-    "Danger": "./assets/Danger.mp4"
+    "Z": "./assets/Z.mp4"
 };
 
 const AVATARS=["🦁","🐯","🦊","🐼","🐨","🦋","🦜","🐬"];

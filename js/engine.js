@@ -1,10 +1,3 @@
-
-let wristHistory = [];
-let holdInterval = null;
-let holdTimer = 0;
-let currentScore = 0;
-let sessionAccuracies = [];
-
 let movementData = {
     totalDistance: 0,
     xDistance: 0,
@@ -324,7 +317,12 @@ function getMovementStats() {
 
 function openCameraChallenge(){
     const sign = allLessonSigns[currentSignIdx];
-    document.getElementById("cam-target-sign").textContent = sign;
+    
+    // Displays the translated word to the user, but hides the English ID for the AI to read
+    const targetElement = document.getElementById("cam-target-sign");
+    targetElement.textContent = t("sign_" + sign); 
+    targetElement.dataset.signId = sign; 
+
     document.getElementById("cam-start-btn").style.display = "block"; 
     document.getElementById("cam-submit-btn").style.display = "none";
     document.getElementById("cam-status").textContent = t('cam_load'); 
@@ -361,7 +359,8 @@ async function startMediaPipeCam() {
 
     if(!mpHands) { 
         mpHands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`}); 
-        mpHands.setOptions({maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.6, minTrackingConfidence:0.6}); 
+        // UPGRADED TO TRACK 2 HANDS MAX
+        mpHands.setOptions({maxNumHands:2, modelComplexity:1, minDetectionConfidence:0.6, minTrackingConfidence:0.6}); 
         mpHands.onResults((res) => onMediaPipeResult(res, canvasCtx, canvasElement)); 
     }
     if(!mpCamera) { 
@@ -397,19 +396,36 @@ function onMediaPipeResult(results, ctx, canvas) {
     ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
     
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        const lm = results.multiHandLandmarks[0]; 
-        drawConnectors(ctx, lm, HAND_CONNECTIONS, {color: '#4CAF50', lineWidth: 4}); 
-        drawLandmarks(ctx, lm, {color: '#fbbf24', lineWidth: 2, radius: 4});
         
-        // TRACK WRIST POSITION (Node 0)
-        wristHistory.push({ x: lm[0].x, y: lm[0].y });
+        let bestScore = 0;
+        let bestHandLm = results.multiHandLandmarks[0];
+
+        // "BEST SCORE WINS" LOOP: Grades all hands visible and takes the highest score
+        for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+            const lm = results.multiHandLandmarks[i];
+            
+            // Draw Skeleton for this hand
+            drawConnectors(ctx, lm, HAND_CONNECTIONS, {color: '#4CAF50', lineWidth: 4}); 
+            drawLandmarks(ctx, lm, {color: '#fbbf24', lineWidth: 2, radius: 4});
+            
+            // Get hidden English ID to run the math
+            const signId = document.getElementById("cam-target-sign").dataset.signId;
+            let score = getGestureScore(signId, lm); 
+            
+            if (score >= bestScore) {
+                bestScore = score;
+                bestHandLm = lm;
+            }
+        }
+
+        // ONLY record the movement of the highest scoring hand to prevent math errors
+        wristHistory.push({ x: bestHandLm[0].x, y: bestHandLm[0].y });
         if (wristHistory.length > 30) wristHistory.shift();
 
         // Update real-time metrics tracking view
         updateMovementStatsUI();
 
-        let score = getGestureScore(document.getElementById("cam-target-sign").textContent, lm); 
-        updateAccUI(score);
+        updateAccUI(bestScore);
     } else { 
         updateAccUI(0); 
     }
@@ -515,6 +531,127 @@ function getGestureScore(sign, lm) {
             }
             break;
         }
+        case "Friend": {
+    // BIM: Two hands with index fingers hooked/linked together
+    // Hand shape: Both index fingers extended, others curled, hands brought together
+    let score = 0;
+
+    // Index finger up, others curled (hook shape)
+    if (idxUp) score += 25;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
+
+    // Index finger tip should be near the middle knuckle area (hooked, not fully straight)
+    // lm[8] = index tip, lm[6] = index PIP joint — if tip is only slightly above PIP, it's bent/hooked
+    let indexBentAmount = lm[6].y - lm[8].y; // small positive = slightly up (hooked)
+    if (indexBentAmount > 0.01 && indexBentAmount < 0.08) score += 30; // hooked position
+
+    s = score;
+    break;
+}
+
+case "Yes": {
+    // BIM: Fist with thumb tucked, nod hand up and down
+    let score = 0;
+
+    // All fingers curled into a fist
+    let isFist = !idxUp && !midUp && !rngUp && !pnkUp;
+    if (isFist) score += 40;
+
+    // Thumb should be tucked (thumb tip below index base)
+    let thumbTucked = lm[4].y > lm[5].y;
+    if (thumbTucked) score += 20;
+
+    // Vertical nodding movement (up-down oscillation)
+    if (isFist && wristHistory.length > 15) {
+        let totalVerticalMovement = 0;
+        let vertDirChanges = 0;
+        let lastVertDir = null;
+
+        for (let i = 1; i < wristHistory.length; i++) {
+            const dy = wristHistory[i].y - wristHistory[i - 1].y;
+            totalVerticalMovement += Math.abs(dy);
+
+            let vertDir = dy > 0.005 ? 'down' : dy < -0.005 ? 'up' : null;
+            if (vertDir && lastVertDir && vertDir !== lastVertDir) vertDirChanges++;
+            if (vertDir) lastVertDir = vertDir;
+        }
+
+        // Must have clear vertical movement with at least 1 direction change (nod)
+        if (totalVerticalMovement > 0.08) score += 20;
+        if (totalVerticalMovement > 0.15) score += 10;
+        if (vertDirChanges >= 1) score += 10; // at least one nod cycle
+    }
+
+    s = score;
+    break;
+}
+
+case "No": {
+    // BIM: Index finger extended, wave side to side (horizontal shake)
+    let score = 0;
+
+    // Index finger up, others curled
+    if (idxUp) score += 25;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
+
+    // Horizontal side-to-side shaking movement
+    if (idxUp && wristHistory.length > 15) {
+        let totalHorizontalMovement = 0;
+        let horizDirChanges = 0;
+        let lastHorizDir = null;
+
+        for (let i = 1; i < wristHistory.length; i++) {
+            const dx = wristHistory[i].x - wristHistory[i - 1].x;
+            totalHorizontalMovement += Math.abs(dx);
+
+            let horizDir = dx > 0.005 ? 'right' : dx < -0.005 ? 'left' : null;
+            if (horizDir && lastHorizDir && horizDir !== lastHorizDir) horizDirChanges++;
+            if (horizDir) lastHorizDir = horizDir;
+        }
+
+        // Must have clear horizontal movement with direction changes (shake)
+        if (totalHorizontalMovement > 0.06) score += 15;
+        if (horizDirChanges >= 1) score += 15; // at least one shake cycle
+        if (horizDirChanges >= 2) score += 15; // stronger shake = more confident
+    }
+
+    s = score;
+    break;
+}
+
+case "Understand": {
+    // BIM: Index finger points to temple/forehead, then flicks upward/forward
+    let score = 0;
+
+    // Index finger extended, others curled (pointing shape)
+    if (idxUp) score += 25;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
+
+    // Hand should be raised (near head level) — wrist Y should be relatively high on screen
+    // In MediaPipe, lower Y value = higher on screen
+    let wristY = lm[0].y;
+    if (wristY < 0.55) score += 15; // hand raised up
+
+    // Flick movement: short upward or forward motion after holding near face
+    if (idxUp && wristHistory.length > 10) {
+        let recentSlice = wristHistory.slice(-10);
+        let firstY = recentSlice[0].y;
+        let lastY = recentSlice[recentSlice.length - 1].y;
+        let deltaY = firstY - lastY; // positive = moved upward on screen
+
+        if (deltaY > 0.04) score += 15; // upward flick detected
+        if (deltaY > 0.08) score += 15; // strong flick
+    }
+
+    s = score;
+    break;
+}
         
         case "Thank you": 
         case "You're Welcome": {
