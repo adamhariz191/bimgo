@@ -359,7 +359,8 @@ async function startMediaPipeCam() {
 
     if(!mpHands) { 
         mpHands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`}); 
-        mpHands.setOptions({maxNumHands:1, modelComplexity:1, minDetectionConfidence:0.6, minTrackingConfidence:0.6}); 
+        // UPGRADED TO TRACK 2 HANDS MAX
+        mpHands.setOptions({maxNumHands:2, modelComplexity:1, minDetectionConfidence:0.6, minTrackingConfidence:0.6}); 
         mpHands.onResults((res) => onMediaPipeResult(res, canvasCtx, canvasElement)); 
     }
     if(!mpCamera) { 
@@ -395,19 +396,36 @@ function onMediaPipeResult(results, ctx, canvas) {
     ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
     
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        const lm = results.multiHandLandmarks[0]; 
-        drawConnectors(ctx, lm, HAND_CONNECTIONS, {color: '#4CAF50', lineWidth: 4}); 
-        drawLandmarks(ctx, lm, {color: '#fbbf24', lineWidth: 2, radius: 4});
         
-        // TRACK WRIST POSITION (Node 0)
-        wristHistory.push({ x: lm[0].x, y: lm[0].y });
+        let bestScore = 0;
+        let bestHandLm = results.multiHandLandmarks[0];
+
+        // "BEST SCORE WINS" LOOP: Grades all hands visible and takes the highest score
+        for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+            const lm = results.multiHandLandmarks[i];
+            
+            // Draw Skeleton for this hand
+            drawConnectors(ctx, lm, HAND_CONNECTIONS, {color: '#4CAF50', lineWidth: 4}); 
+            drawLandmarks(ctx, lm, {color: '#fbbf24', lineWidth: 2, radius: 4});
+            
+            // Get hidden English ID to run the math
+            const signId = document.getElementById("cam-target-sign").dataset.signId;
+            let score = getGestureScore(signId, lm); 
+            
+            if (score >= bestScore) {
+                bestScore = score;
+                bestHandLm = lm;
+            }
+        }
+
+        // ONLY record the movement of the highest scoring hand to prevent math errors
+        wristHistory.push({ x: bestHandLm[0].x, y: bestHandLm[0].y });
         if (wristHistory.length > 30) wristHistory.shift();
 
         // Update real-time metrics tracking view
         updateMovementStatsUI();
 
-        let score = getGestureScore(document.getElementById("cam-target-sign").textContent, lm); 
-        updateAccUI(score);
+        updateAccUI(bestScore);
     } else { 
         updateAccUI(0); 
     }
