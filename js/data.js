@@ -88,8 +88,8 @@ const CHAPTERS = [
   {
     id: 3, dictKey: "ch3", subtitle: "Daily Life", icon: "🏠", color: "#FF9800",
     levels: [
-      { id: "3-1", dictKey: "lvl_basic_needs", signs: ["Eat", "Drink", "Water", "Food"], xp: 500 },
-      { id: "3-2", dictKey: "lvl_core_fam", signs: ["Mother", "Father", "Toilet"], xp: 500 },
+      { id: "3-1", dictKey: "lvl_basic_needs", signs: ["Eat", "Drink"], xp: 500 },
+      { id: "3-2", dictKey: "lvl_core_fam", signs: ["Mother", "Father"], xp: 500 },
       { id: "3-3", dictKey: "lvl_time_act", signs: ["Tomorrow", "Need", "Go"], xp: 500 },
       { id: "3-4", dictKey: "lvl_ext_fam", signs: ["Brother", "Sister", "Home"], xp: 500 },
       { id: "3-5", dictKey: "lvl_pres_act", signs: ["Work", "School", "Want", "Today", "Now"], xp: 500 },
