@@ -75,44 +75,98 @@ function startLevel(li){
 }
 
 function startQuiz() {
-    quizScore = 0; currentQuizIdx = 0; let allChapterSigns = [];
+    quizScore = 0; 
+    currentQuizIdx = 0; 
+    let allChapterSigns = [];
     currentChapter.levels.forEach(l => { if (!l.isQuiz) allChapterSigns.push(...l.signs); });
     quizQuestions = [];
-    for(let i = 0; i < 8; i++) {
-        let correctSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)]; let options = [correctSign];
-        while(options.length < 4) { let wrongSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)]; if(!options.includes(wrongSign)) options.push(wrongSign); }
-        options.sort(() => Math.random() - 0.5); quizQuestions.push({ correct: correctSign, options: options });
+    for(let i = 0; i < 10; i++) {
+        let correctSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)]; 
+        let options = [correctSign];
+        while(options.length < 4) { 
+            let wrongSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)]; 
+            if(!options.includes(wrongSign)) options.push(wrongSign); 
+        }
+        options.sort(() => Math.random() - 0.5); 
+        quizQuestions.push({ correct: correctSign, options: options });
     }
-    renderQuizQuestion(); showScreen('s-quiz');
+    renderQuizQuestion(); 
+    showScreen('s-quiz');
 }
 
 function renderQuizQuestion() {
-    let q = quizQuestions[currentQuizIdx]; document.getElementById('quiz-progress-text').textContent = `${currentQuizIdx + 1}/8`;
-    document.getElementById('quiz-gif').src = `https://via.placeholder.com/400x300/111c11/4CAF50?text=Sign:+` + encodeURIComponent(t("sign_" + q.correct));
+    let q = quizQuestions[currentQuizIdx]; 
+    document.getElementById('quiz-progress-text').textContent = `${currentQuizIdx + 1}/10`;
+    
+    let mediaUrl = typeof SIGN_MEDIA !== 'undefined' ? SIGN_MEDIA[q.correct] : null;
+    let mediaContainer = document.querySelector("#s-quiz .gif-container");
+    
+    if (mediaUrl && (mediaUrl.toLowerCase().endsWith(".mp4") || mediaUrl.toLowerCase().endsWith(".webm"))) {
+        mediaContainer.innerHTML = `<video class="lesson-gif-img" autoplay loop muted playsinline src="${mediaUrl}" style="width:100%; border-radius:16px; object-fit:cover;"></video>`;
+    } else {
+        let fallbackUrl = `https://via.placeholder.com/400x300/111c11/4CAF50?text=Sign:+${encodeURIComponent(t("sign_" + q.correct))}`;
+        mediaContainer.innerHTML = `<img id="quiz-gif" class="lesson-gif-img" src="${mediaUrl || fallbackUrl}" alt="Quiz Image" style="width:100%; border-radius:16px;">`;
+    }
+
+    let feedback = document.getElementById('quiz-feedback');
+    if(!feedback) {
+        feedback = document.createElement('div');
+        feedback.id = 'quiz-feedback';
+        feedback.style.cssText = 'text-align:center; font-weight:900; margin-top:20px; font-size:18px; min-height:28px; transition: 0.3s;';
+        document.getElementById('quiz-options').after(feedback);
+    }
+    feedback.textContent = ""; 
+
     let grid = document.getElementById('quiz-options');
     grid.innerHTML = q.options.map(opt => `<button class="quiz-btn" onclick="handleQuizAnswer(this, '${opt}', '${q.correct}')">${t("sign_" + opt)}</button>`).join('');
 }
 
 function handleQuizAnswer(btn, selected, correct) {
     document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
-    if (selected === correct) { btn.style.background = "#4CAF50"; btn.style.borderColor = "#4CAF50"; quizScore++; } 
-    else { btn.style.background = "#F44336"; btn.style.borderColor = "#F44336"; document.querySelectorAll('.quiz-btn').forEach(b => { 
-        if(b.textContent === t("sign_" + correct)) { b.style.background = "#4CAF50"; b.style.borderColor = "#4CAF50"; } 
-    }); }
-    setTimeout(() => { currentQuizIdx++; if(currentQuizIdx < 8) { renderQuizQuestion(); } else { finishQuiz(); } }, 1200);
+    let feedback = document.getElementById('quiz-feedback');
+
+    if (selected === correct) { 
+        btn.style.background = "#4CAF50"; 
+        btn.style.borderColor = "#4CAF50"; 
+        quizScore++; 
+        if(feedback) { 
+            feedback.style.color = "#4CAF50"; 
+            feedback.textContent = "✅ Tepat! (Correct)"; 
+        }
+    } else { 
+        btn.style.background = "#F44336"; 
+        btn.style.borderColor = "#F44336"; 
+        document.querySelectorAll('.quiz-btn').forEach(b => { 
+            if(b.textContent === t("sign_" + correct)) { 
+                b.style.background = "#4CAF50"; 
+                b.style.borderColor = "#4CAF50"; 
+            } 
+        }); 
+        if(feedback) { 
+            feedback.style.color = "#F44336"; 
+            feedback.textContent = `❌ Salah. Jawapannya ialah: ${t("sign_" + correct)}`; 
+        }
+    }
+    
+    setTimeout(() => { 
+        currentQuizIdx++; 
+        if(currentQuizIdx < 10) renderQuizQuestion(); 
+        else finishQuiz(); 
+    }, 2500);
 }
 
 function finishQuiz() {
-    const isSuccess = quizScore >= 6;
+    const isSuccess = quizScore >= 8;
     const resIcon = document.getElementById("res-icon"); const resTitle = document.getElementById("res-title"); const resSub = document.getElementById("res-sub"); const retryBtn = document.getElementById("res-retry-btn"); const nextBtn = document.getElementById("res-next-btn"); const statsBox = document.getElementById("res-stats-box");
+    
     if (isSuccess) {
-        resIcon.textContent = "🏅"; resTitle.textContent = t('quiz_pass'); resTitle.style.color = "#4CAF50"; resSub.textContent = `${quizScore}/8 - Lulus!`;
+        resIcon.textContent = "🏅"; resTitle.textContent = t('quiz_pass'); resTitle.style.color = "#4CAF50"; resSub.textContent = `${quizScore}/10 - Lulus!`;
         retryBtn.style.display = "none"; nextBtn.style.display = "block"; nextBtn.textContent = t('res_home'); nextBtn.onclick = () => showScreen('s-home');
-        document.getElementById("res-xp-val").textContent = currentLevel.xp; document.getElementById("t-res-acc").textContent = t('quiz_score'); document.getElementById("res-acc-val").textContent = Math.round((quizScore/8)*100);
+        document.getElementById("res-xp-val").textContent = currentLevel.xp; document.getElementById("t-res-acc").textContent = t('quiz_score'); document.getElementById("res-acc-val").textContent = Math.round((quizScore/10)*100);
         statsBox.style.display = "flex"; 
         progress[currentLevel.id] = {completed:true}; profile.progress = progress; profile.xp = (profile.xp || 0) + currentLevel.xp; mockDB[profile.email] = profile; ss("bimgo_users", mockDB);
     } else {
-        resIcon.textContent = "💔"; resTitle.textContent = t('quiz_fail'); resTitle.style.color = "#F44336"; resSub.textContent = `${quizScore}/8. ${t('quiz_req')}`;
+        resIcon.textContent = "💔"; resTitle.textContent = t('quiz_fail'); resTitle.style.color = "#F44336"; resSub.textContent = `${quizScore}/10. ${t('quiz_req')}`;
         retryBtn.style.display = "block"; nextBtn.style.display = "none"; retryBtn.textContent = t('res_retrybtn'); retryBtn.onclick = () => startQuiz(); statsBox.style.display = "none";
     }
     showScreen("s-result");
