@@ -460,8 +460,8 @@ function getGestureScore(sign, lm) {
         }
 
         case "Bye":
-        case "Good Bye":
         case "Goodbye":
+        case "Good Bye":
         case "bye": {
             let fingersUpCount = 0;
             if (idxUp) fingersUpCount++;
@@ -523,7 +523,6 @@ function getGestureScore(sign, lm) {
                 for (let pos of wristHistory) { if (pos.y < minY) minY = pos.y; }
                 let currentY = wristHistory[wristHistory.length - 1].y; 
                 let deltaY = currentY - minY; 
-                
                 if (deltaY > 0.05) s += 20; 
                 if (deltaY > 0.12) s += 20; 
             }
@@ -663,18 +662,13 @@ function getGestureScore(sign, lm) {
         }
 
         // ========================================================
-        // CHAPTER 3: DAILY LIFE ENGINE (100% COMPLETE)
+        // CHAPTER 3: DAILY LIFE ENGINE (ALIGNED WITH MOCK DATA)
         // ========================================================
-        case "Eat":
-        case "Makan":
-        case "Food":
-        case "Makanan": {
+        case "Eat": {
             let score = 0;
             if (!idxUp && !midUp && !rngUp && !pnkUp) score += 30;
-
             let thumbToIndex = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
-            let thumbToMid   = Math.hypot(lm[4].x - lm[12].x, lm[4].y - lm[12].y);
-            if (thumbToIndex < 0.12 && thumbToMid < 0.15) score += 30;
+            if (thumbToIndex < 0.12) score += 30;
 
             if (wristHistory.length > 10) {
                 if (lm[0].y < 0.58) score += 20; 
@@ -684,80 +678,38 @@ function getGestureScore(sign, lm) {
             break;
         }
 
-        case "Minum":
         case "Drink": {
             let score = 0;
             let thumbUp = lm[4].y < lm[3].y;
-            let idxCurled = lm[8].y > lm[6].y;
-            let midCurled = lm[12].y > lm[10].y;
-            
-            if (thumbUp && idxCurled && midCurled) score += 50; 
-            
+            if (thumbUp && !idxUp && !midUp) score += 50; 
             if (score === 50 && wristHistory.length > 10) {
-                if (range.rangeY > 0.02 || metrics.totalDistance > 0.04) score += 25;
-                if (getVerticalDirection() === 'up' || metrics.peakVelocity > 1.5) score += 25;
+                if (range.rangeY > 0.02 || metrics.totalDistance > 0.04) score += 50;
             }
             s = score;
             break;
         }
 
-        case "Water":
-        case "Air": {
+        case "Mother": {
             let score = 0;
-            if (idxUp && midUp && rngUp && !pnkUp) score += 60;
-            if (score === 60 && wristHistory.length > 5) {
-                if (calculateMovementMetrics().totalDistance < 0.03) score += 40;
+            if (idxUp && midUp && rngUp) score += 45; 
+            if (wristHistory.length > 10) {
+                if (getVerticalDirection() === 'down' && range.rangeY > 0.04) score += 55; 
             }
             s = score;
             break;
         }
 
-        case "Father":
-        case "Ayah": {
-            let fatherFingers = 0;
-            if (idxUp) fatherFingers++; if (midUp) fatherFingers++; if (rngUp) fatherFingers++;
-            s += (fatherFingers * 15); 
-            
-            if (wristHistory.length > 10) {
-                let maxY = 0; 
-                for (let pos of wristHistory) { if (pos.y > maxY) maxY = pos.y; }
-                let currentY = wristHistory[wristHistory.length - 1].y; 
-                let deltaY = currentY - maxY; 
-                if (deltaY < -0.04) s = 100; 
-            }
-            break;
-        }
-
-        case "Mother":
-        case "Ibu": {
-            let motherFingers = 0;
-            if (idxUp) motherFingers++; if (midUp) motherFingers++; if (rngUp) motherFingers++;
-            s += (motherFingers * 15); 
-            
-            if (wristHistory.length > 10) {
-                let minY = 1; 
-                for (let pos of wristHistory) { if (pos.y < minY) minY = pos.y; }
-                let currentY = wristHistory[wristHistory.length - 1].y; 
-                let deltaY = currentY - minY; 
-                if (deltaY > 0.04) s = 100; 
-            }
-            break;
-        }
-
-        case "Toilet":
-        case "Tandas": {
+        case "Father": {
             let score = 0;
-            let thumbBetween = lm[4].x > lm[6].x && lm[4].x < lm[10].x;
-            if (!idxUp && !midUp && thumbBetween) score += 50;
-            if (score === 50 && wristHistory.length > 10) {
-                if (metrics.directionChanges >= 2 && range.rangeX > 0.03) score += 50;
+            if (idxUp && midUp && rngUp) score += 45; 
+            if (wristHistory.length > 10) {
+                if (getVerticalDirection() === 'up' && range.rangeY > 0.04) score += 55; 
             }
             s = score;
             break;
         }
 
-        case "Tomorrow":
-        case "Esok": {
+        case "Tomorrow": {
             let score = 0;
             if (lm[4].y < lm[3].y && !idxUp && !midUp) score += 50;
             if (score === 50 && wristHistory.length > 10) {
@@ -767,23 +719,10 @@ function getGestureScore(sign, lm) {
             break;
         }
 
-        case "Later":
-        case "Nanti": {
-            let score = 0;
-            let isLshape = lm[4].x < lm[5].x && idxUp && !midUp;
-            if (isLshape) score += 50;
-            if (score === 50 && wristHistory.length > 10) {
-                if (getVerticalDirection() === 'down' && range.rangeY > 0.03) score += 50;
-            }
-            s = score;
-            break;
-        }
-
-        case "Need":
-        case "Perlu": {
+        case "Need": {
             let score = 0;
             let isHook = lm[8].y > lm[6].y && lm[6].y < lm[5].y;
-            if (isHook && !midUp && !rngUp) score += 50;
+            if (isHook && !midUp) score += 50;
             if (score === 50 && wristHistory.length > 10) {
                 if (getVerticalDirection() === 'down' && range.rangeY > 0.04) score += 50;
             }
@@ -791,8 +730,7 @@ function getGestureScore(sign, lm) {
             break;
         }
 
-        case "Go":
-        case "Pergi": {
+        case "Go": {
             let score = 0;
             if (idxUp && !midUp && !rngUp) score += 50;
             if (score === 50 && wristHistory.length > 8) {
@@ -803,33 +741,17 @@ function getGestureScore(sign, lm) {
         }
 
         case "Brother":
-        case "Sister":
-        case "Abang/Adik Lelaki":
-        case "Kakak/Adik Perempuan": {
+        case "Sister": {
             if (wristHistory.length > 0) s += 40;
             if (wristHistory.length > 10) {
-                let pathLength = metrics.totalDistance;
-                if (pathLength > 0.15) s += 30;
-                if (pathLength > 0.25) s = 100; 
+                if (metrics.totalDistance > 0.20) s = 100; 
             }
             break;
         }
 
-        case "Home":
-        case "Rumah": {
+        case "Work": {
             let score = 0;
-            if (idxUp && midUp && rngUp && pnkUp) score += 50;
-            if (score === 50 && wristHistory.length > 8) {
-                if (metrics.totalDistance < 0.03) score += 50;
-            }
-            s = score;
-            break;
-        }
-
-        case "Work":
-        case "Kerja": {
-            let score = 0;
-            if (!idxUp && !midUp && !rngUp && !pnkUp) score += 50;
+            if (!idxUp && !midUp && !rngUp) score += 50;
             if (score === 50 && wristHistory.length > 10) {
                 if (metrics.directionChanges >= 2 && metrics.yDistance > 0.03) score += 50;
             }
@@ -837,8 +759,7 @@ function getGestureScore(sign, lm) {
             break;
         }
 
-        case "School":
-        case "Sekolah": {
+        case "School": {
             let score = 0;
             if (idxUp && midUp && rngUp && pnkUp) score += 50;
             if (score === 50 && wristHistory.length > 10) {
@@ -848,23 +769,9 @@ function getGestureScore(sign, lm) {
             break;
         }
 
-        case "Want":
-        case "Mahu": {
+        case "Now": {
             let score = 0;
-            if (idxUp && midUp && rngUp) score += 50;
-            if (score === 50 && wristHistory.length > 10) {
-                if (getVerticalDirection() === 'down' && metrics.totalDistance > 0.04) score += 50;
-            }
-            s = score;
-            break;
-        }
-
-        case "Today":
-        case "Now":
-        case "Hari Ini":
-        case "Sekarang": {
-            let score = 0;
-            let isYshape = lm[4].x < lm[5].x && pnkUp && !idxUp && !midUp && !rngUp;
+            let isYshape = lm[4].x < lm[5].x && pnkUp && !idxUp && !midUp;
             if (isYshape) score += 50;
             if (score === 50 && wristHistory.length > 10) {
                 if (metrics.yDistance > 0.04 && getVerticalDirection() === 'down') score += 50;
@@ -874,161 +781,72 @@ function getGestureScore(sign, lm) {
         }
 
         // ========================================================
-        // CHAPTER 4: EMERGENCY ENGINE (100% COMPLETE & FULL ALERTS)
+        // CHAPTER 4: EMERGENCY ENGINE (100% MATCHED TO DATA.JS)
         // ========================================================
-        case "Pain":
-        case "Sakit": {
-            let score = 0;
-            if (idxUp) score += 10;
-            if (midUp) score += 10;
-            if (rngUp) score += 10;
-            if (pnkUp) score += 10;
-
-            if (wristHistory.length > 15) {
-                let maxSpread = Math.max(range.rangeX, range.rangeY);
-                if (maxSpread > 0.04) {
-                    if (metrics.totalDistance > 0.15) score += 20;
-                    if (metrics.totalDistance > 0.30) score += 20;
-                    if (metrics.directionChanges >= 3) score += 20;
-                }
-            }
-            s = score;
-            break;
-        }
-
-        case "Medicine":
-        case "Ubat": {
-            let score = 0;
-            if (idxUp) score += 15;
-            if (!midUp) score += 35; 
-            if (rngUp) score += 15;
-            if (pnkUp) score += 15;
-
-            if (wristHistory.length > 15) {
-                let maxSpread = Math.max(range.rangeX, range.rangeY);
-                if (maxSpread > 0.02) {
-                    if (metrics.directionChanges >= 2) score += 10;
-                    if (metrics.totalDistance > 0.06) score += 10;
-                }
-            }
-            s = score;
-            break;
-        }
         
-        case "Dizzy":
-        case "Pening": {
-            let score = 0;
-            if (idxUp) score += 20;
-            if (!midUp) score += 10;
-            if (!rngUp) score += 10;
-            if (!pnkUp) score += 10;
-
-            let wristY = lm[0].y;
-            if (wristY < 0.50) score += 15; 
-
-            if (wristHistory.length > 10) {
-                let horizDirChanges = 0;
-                let lastHorizDir = null;
-                let totalHoriz = 0;
-
-                for (let i = 1; i < wristHistory.length; i++) {
-                    const dx = wristHistory[i].x - wristHistory[i - 1].x;
-                    totalHoriz += Math.abs(dx);
-                    let horizDir = dx > 0.004 ? 'right' : dx < -0.004 ? 'left' : null;
-                    if (horizDir && lastHorizDir && horizDir !== lastHorizDir) horizDirChanges++;
-                    if (horizDir) lastHorizDir = horizDir;
-                }
-                if (totalHoriz > 0.06) score += 15;
-                if (horizDirChanges >= 2) score += 10; 
-                if (range.rangeX > 0.10) score += 10; 
-            }
-            s = score;
-            break;
-        }
-
-        case "Help":
-        case "Tolong": {
+        // --- LEVEL 1: FIRST RESPONSE ---
+        case "Help": {
             let score = 0;
             let isFist = !idxUp && !midUp && !rngUp && !pnkUp;
             let thumbIsUp = lm[4].y < lm[5].y; 
+            if (isFist && thumbIsUp) score += 50; 
             
-            if (isFist && thumbIsUp) {
-                score += 50; 
-            } else if (isFist) {
-                score += 20; 
-            }
-            
-            if (score === 50 && wristHistory.length > 15) {
-                let lowestY = 0;
-                for (let pos of wristHistory) { if (pos.y > lowestY) lowestY = pos.y; }
-                let currentY = wristHistory[wristHistory.length - 1].y;
-                let deltaY = lowestY - currentY; 
-                if (deltaY > 0.10) score += 25; 
-                if (deltaY > 0.20) score += 25; 
+            if (score === 50 && wristHistory.length > 12) {
+                if (metrics.totalDistance > 0.05 || getVerticalDirection() === 'up') score += 50; 
             }
             s = score;
             break;
         }
-        
-        case "Stop":
-        case "Berhenti": {
+
+        case "Medicine": {
             let score = 0;
-            if (idxUp && midUp && rngUp && pnkUp) {
-                score += 50; 
-            } else if (idxUp && midUp && rngUp) {
-                score += 20; 
-            }
-            
+            if (idxUp && !midUp && rngUp && pnkUp) score += 50;
             if (score === 50 && wristHistory.length > 10) {
-                let highestY = 1; 
-                for (let pos of wristHistory) { if (pos.y < highestY) highestY = pos.y; }
-                let currentY = wristHistory[wristHistory.length - 1].y;
-                let deltaY = currentY - highestY; 
-                if (deltaY > 0.08) score += 25; 
-                if (deltaY > 0.15) score += 25; 
+                if (metrics.directionChanges >= 2 || metrics.totalDistance > 0.04) score += 50;
             }
             s = score;
             break;
         }
         
-        case "Danger":
-        case "Bahaya": {
+        case "Dizzy": {
             let score = 0;
-            if (idxUp && midUp && rngUp && pnkUp) {
-                score += 40; 
-            } else if (idxUp && midUp) {
-                score += 20; 
-            }
-            
-            if (wristHistory.length > 15) {
-                let totalVerticalMovement = 0;
-                for (let i = 1; i < wristHistory.length; i++) {
-                    totalVerticalMovement += Math.abs(wristHistory[i].y - wristHistory[i-1].y);
-                }
-                if (totalVerticalMovement > 0.15) score += 30; 
-                if (totalVerticalMovement > 0.30) score += 30; 
+            if (idxUp && !midUp && !rngUp) score += 40;
+            if (lm[0].y < 0.52) score += 20; 
+
+            if (score === 60 && wristHistory.length > 12) {
+                if (metrics.directionChanges >= 2 || range.rangeX > 0.04) score += 40;
             }
             s = score;
             break;
         }
 
-        case "Police":
-        case "Polis": {
+        // --- LEVEL 2: IMMEDIATE ALERTS ---
+        case "Danger": {
             let score = 0;
-            if (idxUp && midUp && !rngUp && !pnkUp) score += 60;
-            if (score === 60 && wristHistory.length > 5) {
-                if (calculateMovementMetrics().totalDistance < 0.03) score += 40;
+            if (idxUp && midUp && rngUp && pnkUp) score += 40;
+            if (score === 40 && wristHistory.length > 12) {
+                if (metrics.directionChanges >= 2 && metrics.peakVelocity > 2.5) score += 60;
+            }
+            s = score;
+            break;
+        }
+        
+        case "Stop": {
+            let score = 0;
+            if (idxUp && midUp && rngUp && pnkUp) score += 50;
+            if (score === 50 && wristHistory.length > 10) {
+                if (metrics.totalDistance > 0.03 || checkHoldSteady(0.02)) score += 50;
             }
             s = score;
             break;
         }
 
-        case "Doctor":
-        case "Doktor": {
+        // --- LEVEL 3: MEDICAL & HAZARDS ---
+        case "Doctor": {
             let score = 0;
             if (idxUp && midUp && !rngUp) score += 50;
-            if (score === 50 && wristHistory.length > 10) {
-                if (metrics.yDistance > 0.03 || metrics.directionChanges >= 1) score += 50;
+            if (score === 50 && wristHistory.length > 8) {
+                if (metrics.yDistance > 0.02 || metrics.directionChanges >= 1) score += 50;
             }
             s = score;
             break;
@@ -1037,78 +855,70 @@ function getGestureScore(sign, lm) {
         case "Hospital": {
             let score = 0;
             if (idxUp && !midUp) score += 60;
-            if (score === 60 && wristHistory.length > 10) {
-                if (metrics.totalDistance > 0.03 || range.rangeX > 0.02) score += 40;
-            }
+            if (score === 60 && metrics.totalDistance > 0.03) score += 40;
             s = score;
             break;
         }
 
-        case "Nurse":
-        case "Jururawat": {
+        case "Nurse": {
             let score = 0;
             if (idxUp && midUp && !rngUp) score += 60;
-            if (score === 60 && lm[0].y < 0.48) score += 40; 
+            if (score === 60 && lm[0].y < 0.45) score += 40; 
             s = score;
             break;
         }
 
-        case "Thief":
-        case "Pencuri": {
+        // --- LEVEL 4: SECURITY & SAFETY ---
+        case "Police": {
             let score = 0;
-            if (!idxUp && !midUp && !rngUp) score += 50;
-            if (score === 50 && wristHistory.length > 10) {
-                if (getHorizontalDirection() === 'left' || range.rangeX > 0.04) score += 50;
-            }
+            if (idxUp && midUp && !rngUp && !pnkUp) score += 60;
+            if (score === 60 && metrics.totalDistance < 0.03) score += 40; 
             s = score;
             break;
         }
 
-        case "Fire":
-        case "Api": {
+        case "Thief": {
+            let score = 0;
+            if (!idxUp && !midUp) score += 50;
+            if (score === 50 && (getHorizontalDirection() === 'left' || range.rangeX > 0.04)) score += 50;
+            s = score;
+            break;
+        }
+
+        case "Fire": {
             let score = 0;
             if (idxUp && midUp && rngUp && pnkUp) score += 40;
-            if (score === 40 && wristHistory.length > 10) {
-                if (getVerticalDirection() === 'up' || metrics.yDistance > 0.05) score += 60;
-            }
+            if (score === 40 && (getVerticalDirection() === 'up' || metrics.yDistance > 0.05)) score += 60;
             s = score;
             break;
         }
 
-        case "Accident":
-        case "Kemalangan": {
+        // --- LEVEL 5: SEVERE SITUATIONS ---
+        case "Accident": {
             let score = 0;
             if (!idxUp && !midUp && !rngUp) score += 50;
-            if (score === 50 && wristHistory.length > 8) {
-                if (metrics.peakVelocity > 2.8 || metrics.totalDistance > 0.06) score += 50;
-            }
+            if (score === 50 && (metrics.peakVelocity > 2.5 || metrics.totalDistance > 0.05)) score += 50;
             s = score;
             break;
         }
 
-        case "Ambulance":
-        case "Ambulans": {
+        case "Ambulance": {
             let score = 0;
-            if (lm[0].y < 0.50) score += 40; 
-            if (score === 40 && wristHistory.length > 12) {
-                if (metrics.directionChanges >= 2 || metrics.xDistance > 0.04) score += 60;
-            }
+            if (lm[0].y < 0.48) score += 40; 
+            if (score === 40 && (metrics.directionChanges >= 2 || metrics.xDistance > 0.04)) score += 60;
             s = score;
             break;
         }
 
-        case "Emergency":
-        case "Kecemasan": {
+        case "Emergency": {
             let score = 0;
             if (idxUp && midUp && rngUp) score += 40;
-            if (score === 40 && wristHistory.length > 12) {
-                if (metrics.peakVelocity > 3.5 || metrics.directionChanges >= 3) score += 60;
-            }
+            if (score === 40 && (metrics.peakVelocity > 3.5 || metrics.directionChanges >= 2)) score += 60;
             s = score;
             break;
         }
         
-        // --- STATIC ALPHABET SIGNS (UNCHANGED) ---
+        // --- STATIC ALPHABET SIGNS ---
         case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
         case "B": if(idxUp) s+=20; if(midUp) s+=20; if(rngUp) s+=20; if(pnkUp) s+=20; if(lm[4].x > Math.min(lm[5].x, lm[17].x) && lm[4].x < Math.max(lm[5].x, lm[17].x)) s+=20; break;
         case "C": if(!idxUp && !midUp) s+=50; if(lm[4].x < lm[5].x) s+=50; break; 
@@ -1162,7 +972,6 @@ function updateAccUI(score) {
             label.style.color = "#4CAF50"; 
             submitBtn.style.display = "none"; 
             
-            // --- SMART SUBMIT LOGIC ---
             if (currentChapter && currentChapter.id > 1) {
                 msgBox.style.background = "#0d2a0d"; 
                 msgBox.style.borderColor = "#4CAF50"; 
