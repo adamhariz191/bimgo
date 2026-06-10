@@ -99,8 +99,8 @@ const CHAPTERS = [
   {
     id: 4, dictKey: "ch4", subtitle: "Emergency", icon: "🆘", color: "#F44336",
     levels: [
-      { id: "4-1", dictKey: "lvl_first_resp", signs: ["Pain","Medicine", "Dizzy"], xp: 500 },
-      { id: "4-2", dictKey: "lvl_imm_alert", signs: ["Help", "Danger", "Stop"], xp: 500 },
+      { id: "4-1", dictKey: "lvl_first_resp", signs: ["Help","Medicine", "Dizzy"], xp: 500 },
+      { id: "4-2", dictKey: "lvl_imm_alert", signs: ["Danger", "Stop"], xp: 500 },
       { id: "4-3", dictKey: "lvl_med_haz", signs: ["Doctor", "Hospital", "Nurse"], xp: 500 },
       { id: "4-4", dictKey: "lvl_sec_safe", signs: ["Police", "Thief", "Fire"], xp: 500 },
       { id: "4-5", dictKey: "lvl_sev_sit", signs: ["Accident", "Ambulance", "Emergency"], xp: 500 },

@@ -851,7 +851,114 @@ function getGestureScore(sign, lm) {
             s = score;
             break;
         }
+        // Emergency
+
+       case "Pain":
+        case "Sakit": {
+            let score = 0;
+
+            // 1. HANDSHAPE: Open hand (all fingers generally extended/relaxed)
+            if (idxUp) score += 10;
+            if (midUp) score += 10;
+            if (rngUp) score += 10;
+            if (pnkUp) score += 10;
+
+            // 2. MOVEMENT: Shaking / Vibrating in place
+            if (wristHistory.length > 15) {
+                
+                // --- THE NOISE FILTER ---
+                // Find the widest physical boundary the hand traveled across.
+                let maxSpread = Math.max(range.rangeX, range.rangeY);
+                
+                // Only grade the movement if the hand moved more than 4% of the screen.
+                // This ignores camera jitter and forces the user to actually shake their hand!
+                if (maxSpread > 0.04) {
+                    
+                    if (metrics.totalDistance > 0.15) score += 20;
+                    if (metrics.totalDistance > 0.30) score += 20;
+
+                    // Must change direction rapidly to prove it's a shake, not a swipe
+                    if (metrics.directionChanges >= 3) {
+                        score += 20;
+                    }
+                }
+            }
+
+            s = score;
+            break;
+        }
+
+case "Medicine":
+        case "Ubat": {
+            let score = 0;
+
+            // 1. HANDSHAPE: Only the middle finger bends down (!midUp). 
+            // Index, Ring, and Pinky stay straight and relaxed (Up).
+            if (idxUp) score += 15;
+            if (!midUp) score += 35; // Heavily weighted because it's the key identifier!
+            if (rngUp) score += 15;
+            if (pnkUp) score += 15;
+
+            // 2. MOVEMENT: Small circular rubbing or tapping motion on the palm
+            if (wristHistory.length > 15) {
+                let maxSpread = Math.max(range.rangeX, range.rangeY);
+                
+                // Noise filter: Hand must be moving, but staying inside a small zone
+                if (maxSpread > 0.02) {
+                    // Continuous circular or tapping shifting
+                    if (metrics.directionChanges >= 2) {
+                        score += 10;
+                    }
+                    // Accumulate tracking distance
+                    if (metrics.totalDistance > 0.06) {
+                        score += 10;
+                    }
+                }
+            }
+
+            s = score;
+            break;
+        }
         
+case "Dizzy":
+case "Pening": {
+    let score = 0;
+
+    // Hand shape: index finger extended pointing up, others curled
+    if (idxUp) score += 20;
+    if (!midUp) score += 10;
+    if (!rngUp) score += 10;
+    if (!pnkUp) score += 10;
+
+    // Hand must be raised high — near head/temple level
+    let wristY = lm[0].y;
+    if (wristY < 0.50) score += 15; // hand raised near head
+
+    // Movement: hands move outward away from head (increasing horizontal range)
+    if (wristHistory.length > 10) {
+        let horizDirChanges = 0;
+        let lastHorizDir = null;
+        let totalHoriz = 0;
+
+        for (let i = 1; i < wristHistory.length; i++) {
+            const dx = wristHistory[i].x - wristHistory[i - 1].x;
+            totalHoriz += Math.abs(dx);
+
+            let horizDir = dx > 0.004 ? 'right' : dx < -0.004 ? 'left' : null;
+            if (horizDir && lastHorizDir && horizDir !== lastHorizDir) horizDirChanges++;
+            if (horizDir) lastHorizDir = horizDir;
+        }
+
+        // Outward spreading + circular motion = horizontal movement + direction changes
+        if (totalHoriz > 0.06) score += 15;
+        if (horizDirChanges >= 2) score += 10; // circular/spreading motion
+        if (range.rangeX > 0.10) score += 10; // wide horizontal spread near head
+    }
+
+    s = score;
+    break;
+}
+
         // Static Alphabet Signs
         case "A": if(!idxUp) s+=20; if(!midUp) s+=20; if(!rngUp) s+=20; if(!pnkUp) s+=20; if(lm[4].y < lm[2].y) s+=20; break;
         case "B": if(idxUp) s+=20; if(midUp) s+=20; if(rngUp) s+=20; if(pnkUp) s+=20; if(lm[4].x > Math.min(lm[5].x, lm[17].x) && lm[4].x < Math.max(lm[5].x, lm[17].x)) s+=20; break;
