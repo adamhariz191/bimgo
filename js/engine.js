@@ -492,36 +492,10 @@ function getGestureScore(sign, lm) {
         }
 
         // --- CHAPTER 2: LEVEL 2 (POLITENESS) ---
-        case "Please":
-        case "Tolong": {
+        case "Please": {
             let score = 0;
-
-            // 1. HANDSHAPE: Flat open hand (all main fingers straight and extended)
-            if (idxUp) score += 15;
-            if (midUp) score += 15;
-            if (rngUp) score += 15;
-            if (pnkUp) score += 15;
-
-            // 2. MOVEMENT: Circular rubbing motion over the chest
-            if (wristHistory.length > 15) {
-                
-                // NOISE FILTER: Hand must be making a deliberate physical circle, not just twitching
-                let maxSpread = Math.max(range.rangeX, range.rangeY);
-                
-                if (maxSpread > 0.03) {
-                    
-                    // A circular motion means the hand is constantly changing directions (Up, Right, Down, Left)
-                    if (metrics.directionChanges >= 3) {
-                        score += 20;
-                    }
-                    
-                    // Accumulate the total distance traveled during the circle
-                    if (metrics.totalDistance > 0.10) {
-                        score += 20;
-                    }
-                }
-            }
-
+            if (idxUp && midUp && rngUp && pnkUp) score += 60;
+            if (score === 60 && checkHoldSteady(0.02)) score += 40;
             s = score;
             break;
         }
@@ -537,7 +511,8 @@ function getGestureScore(sign, lm) {
             break;
         }
 
-        case "Thank you": {
+        case "Thank you": 
+        case "You're Welcome": {
             if(idxUp) s += 15; 
             if(midUp) s += 15; 
             if(rngUp) s += 15; 
@@ -553,47 +528,6 @@ function getGestureScore(sign, lm) {
             }
             break;
         }
-        case "You're Welcome": {
-            let score = 0;
-
-            // 1. HANDSHAPE: The "Y" Shape
-            // Pinky is UP. Index, Middle, and Ring are FOLDED (Down).
-            if (pnkUp) score += 15;
-            if (!idxUp) score += 10;
-            if (!midUp) score += 10;
-            if (!rngUp) score += 10;
-            
-            // Synergy Bonus: If they nail the exact shape perfectly
-            if (pnkUp && !idxUp && !midUp && !rngUp) {
-                score += 15;
-            }
-
-            // 2. MOVEMENT: Repeated back-and-forth (Body to Front)
-            if (wristHistory.length > 15) {
-                
-                // NOISE FILTER: Ensures they are actually moving, not just trembling
-                let maxSpread = Math.max(range.rangeX, range.rangeY);
-                
-                // Even when moving strictly forward/backward (Z-axis), the human hand 
-                // naturally drifts up/down/left/right enough to trigger this 2D spread filter.
-                if (maxSpread > 0.03) {
-                    
-                    // Pushing forward and pulling back repeatedly triggers multiple direction changes
-                    if (metrics.directionChanges >= 3) {
-                        score += 20;
-                    }
-                    
-                    // Accumulate the total distance of the repeated pumps
-                    if (metrics.totalDistance > 0.10) {
-                        score += 20;
-                    }
-                }
-            }
-
-            s = score;
-            break;
-        }
-
 
         // --- CHAPTER 2: LEVEL 3 (BASIC ANSWERS) ---
         case "Yes": {
@@ -690,159 +624,42 @@ function getGestureScore(sign, lm) {
             break;
         }
 
-       case "How are you?":  // <--- Added the question mark right here!
-        case "Apa khabar":
-        case "Apa khabar?": { // Added it here too just in case!
-            
-            // 1. Create the memory state
-            if (typeof window.apaStage === "undefined") {
-                window.apaStage = 0;
+        case "How are you?": {
+            let score = 0;
+            if (idxUp && midUp && rngUp) score += 50;
+            if (score === 50 && wristHistory.length > 10) {
+                if (metrics.totalDistance > 0.04 || metrics.peakVelocity > 1.5) score += 50;
             }
-
-            // 2. Define the shapes
-            let isOpenHand = idxUp && midUp && rngUp && pnkUp;
-            let isThumbsUp = !idxUp && !midUp && !rngUp && !pnkUp;
-
-            // 3. The "Win Lock"
-            if (window.apaStage === 2) {
-                s = 100;
-                break; 
-            }
-
-            // 4. The Logic Stages
-            if (isOpenHand) {
-                window.apaStage = 1;
-                s = 50;
-            } else if (isThumbsUp && window.apaStage === 1) {
-                window.apaStage = 2;
-                s = 100;
-            } else if (window.apaStage === 1) {
-                s = 50;
-            } else if (isThumbsUp && window.apaStage === 0) {
-                s = 30;
-            } else {
-                s = 0;
-            }
-            
+            s = score;
             break;
         }
 
         // --- CHAPTER 2: LEVEL 5 (INTRODUCTIONS) ---
-       case "Me":
-        case "Saya": {
-    let score = 0;
-
-    // HAND SHAPE: Only index finger extended, pointing forward
-    // Others curled, thumb tucked
-    if (idxUp) score += 25;
-    if (!midUp) score += 15;
-    if (!rngUp) score += 15;
-    if (!pnkUp) score += 15;
-
-    // Index finger should be pointing HORIZONTALLY (forward toward chest)
-    // Tip and PIP should be at similar Y level (horizontal, not pointing up)
-    // lm[8] = index tip, lm[6] = index PIP, lm[5] = index MCP
-    let indexHorizontal = Math.abs(lm[8].y - lm[6].y) < 0.06; // tip and PIP at same height
-    if (indexHorizontal) score += 15;
-
-    // Thumb tucked alongside (not sticking up)
-    let thumbTucked = lm[4].y > lm[3].y;
-    if (thumbTucked) score += 5;
-
-    // Hand should be at chest level (not too high, not too low)
-    // wrist Y between 0.4 and 0.75 = chest area
-    if (lm[0].y > 0.40 && lm[0].y < 0.75) score += 10;
-
-    // STATIC HOLD: pointing gesture, no big movement needed
-    if (wristHistory.length > 8) {
-        if (metrics.totalDistance < 0.05) score += 10; // steady hold
-    }
-
-    s = score;
-    break;
-}
-
-        case "You":
-case "Awak":
-case "Kamu": {
-    let score = 0;
-
-    // HAND SHAPE: index finger pointing FORWARD toward screen
-    // Only index up, all others curled
-    if (idxUp) score += 25;
-    if (!midUp) score += 15;
-    if (!rngUp) score += 15;
-    if (!pnkUp) score += 15;
-
-    // Index pointing FORWARD (horizontal) not upward
-    // tip and PIP at similar Y = horizontal pointing toward camera
-    let tipY  = lm[8].y;
-    let pipY  = lm[6].y;
-    let mcpY  = lm[5].y;
-    let indexHorizontal = Math.abs(tipY - pipY) < 0.07;
-    if (indexHorizontal) score += 20;
-
-    // Thumb tucked (not sticking up)
-    let thumbTucked = lm[4].y > lm[3].y;
-    if (thumbTucked) score += 5;
-
-    // STATIC: pointing forward is a held gesture, minimal movement
-    if (wristHistory.length > 8) {
-        if (metrics.totalDistance < 0.06) score += 5;
-    }
-
-    s = score;
-    break;
-}
-
-case "Name":
-case "Nama": {
-    let score = 0;
-
-    // HAND SHAPE: index + middle fingers extended/relaxed
-    // Ring and pinky folded
-    if (idxUp) score += 20;
-    if (midUp) score += 20;
-    if (!rngUp) score += 10;
-    if (!pnkUp) score += 10;
-
-    // Both index and middle up together = confirmed shape
-    if (idxUp && midUp && !rngUp && !pnkUp) score += 10;
-
-    // Hand at chest level (both hands are near chest in the image)
-    if (lm[0].y > 0.35 && lm[0].y < 0.75) score += 10;
-
-    // MOVEMENT: one hand moves DOWN while other stays still
-    // Since best-score-wins tracks the moving hand,
-    // detect downward movement on Y axis
-    if (wristHistory.length > 10) {
-        let totalVert  = 0;
-        let totalHoriz = 0;
-        let vertDirChanges = 0;
-        let lastVertDir = null;
-
-        for (let i = 1; i < wristHistory.length; i++) {
-            const dx = wristHistory[i].x - wristHistory[i - 1].x;
-            const dy = wristHistory[i].y - wristHistory[i - 1].y;
-            totalVert  += Math.abs(dy);
-            totalHoriz += Math.abs(dx);
-
-            let vertDir = dy > 0.004 ? 'down' : dy < -0.004 ? 'up' : null;
-            if (vertDir && lastVertDir && vertDir !== lastVertDir) vertDirChanges++;
-            if (vertDir) lastVertDir = vertDir;
+        case "Me": {
+            let score = 0;
+            if (idxUp && !midUp && !rngUp && !pnkUp) score += 60;
+            if (score === 60 && checkHoldSteady(0.015)) score += 40;
+            s = score;
+            break;
         }
 
-        // Vertical must dominate (moving down, not sideways)
-        if (totalVert > totalHoriz * 1.2) score += 10;
+        case "You": {
+            let score = 0;
+            if (idxUp && !midUp && !rngUp && !pnkUp) score += 60;
+            if (score === 60 && checkHoldSteady(0.015)) score += 40;
+            s = score;
+            break;
+        }
 
-        // Downward movement detected
-        if (getVerticalDirection() === 'down') score += 10;
-        if (range.rangeY > 0.04) score += 10; // enough vertical range
-    }
-
-    s = score;
-    break;
-}
+        case "Name": {
+            let score = 0;
+            if (idxUp && midUp && !rngUp && !pnkUp) score += 50;
+            if (score === 50 && wristHistory.length > 8) {
+                if (metrics.totalDistance > 0.02 || range.rangeY > 0.01) score += 50;
+            }
+            s = score;
+            break;
+        }
 
         // ========================================================
         // CHAPTER 3: DAILY LIFE ENGINE (ALIGNED WITH MOCK DATA)
@@ -872,65 +689,25 @@ case "Nama": {
             break;
         }
 
-        case "Mother":
-case "Ibu": {
-    let score = 0;
+        case "Mother": {
+            let score = 0;
+            if (idxUp && midUp && rngUp) score += 45; 
+            if (wristHistory.length > 10) {
+                if (getVerticalDirection() === 'down' && range.rangeY > 0.04) score += 55; 
+            }
+            s = score;
+            break;
+        }
 
-    // HAND SHAPE: all 4 fingers extended up, flat open hand
-    if (idxUp) score += 15;
-    if (midUp) score += 15;
-    if (rngUp) score += 15;
-    if (pnkUp) score += 15;
-
-    // All 4 up together = confirmed flat open hand
-    if (idxUp && midUp && rngUp && pnkUp) score += 10;
-
-    // POSITION: hand at CHIN level (lower face area)
-    // wrist Y between 0.55 and 0.80 = chin/mouth area
-    if (lm[0].y > 0.55 && lm[0].y < 0.80) score += 20;
-
-    // Fingertips should be clearly above wrist (fingers pointing up)
-    let tipsAboveWrist = lm[8].y < lm[0].y && lm[12].y < lm[0].y;
-    if (tipsAboveWrist) score += 10;
-
-    // STATIC: held position, minimal movement
-    if (wristHistory.length > 8) {
-        if (metrics.totalDistance < 0.05) score += 10;
-    }
-
-    s = score;
-    break;
-}
-
-case "Father":
-case "Ayah": {
-    let score = 0;
-
-    // HAND SHAPE: all 4 fingers extended up, flat open hand
-    if (idxUp) score += 15;
-    if (midUp) score += 15;
-    if (rngUp) score += 15;
-    if (pnkUp) score += 15;
-
-    // All 4 up together = confirmed flat open hand
-    if (idxUp && midUp && rngUp && pnkUp) score += 10;
-
-    // POSITION: hand at FOREHEAD level (upper face area)
-    // wrist Y below 0.45 = forehead/top of head area
-    if (lm[0].y < 0.45) score += 20;
-
-    // Fingertips should be clearly above wrist (fingers pointing up)
-    let tipsAboveWrist = lm[8].y < lm[0].y && lm[12].y < lm[0].y;
-    if (tipsAboveWrist) score += 10;
-
-    // STATIC: held position, minimal movement
-    if (wristHistory.length > 8) {
-        if (metrics.totalDistance < 0.05) score += 10;
-    }
-
-    s = score;
-    break;
-}
+        case "Father": {
+            let score = 0;
+            if (idxUp && midUp && rngUp) score += 45; 
+            if (wristHistory.length > 10) {
+                if (getVerticalDirection() === 'up' && range.rangeY > 0.04) score += 55; 
+            }
+            s = score;
+            break;
+        }
 
         case "Tomorrow": {
             let score = 0;
