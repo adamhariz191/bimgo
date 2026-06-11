@@ -11,6 +11,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* FORCED CAMERA HEIGHT OVERRIDE */
+        .hand-canvas-wrap, #cam-container {
+            height: 60vh !important; /* Takes up 60% of the screen height */
+            min-height: 380px !important; /* Guarantees it never squashes */
+            aspect-ratio: auto !important; /* Overrides any old ratio settings */
+            border-radius: 16px !important;
+        }
+
+        #cam-video, #hand-canvas {
+            height: 100% !important;
+            width: 100% !important;
+            object-fit: cover !important; /* Prevents stretching */
+        }
+    </style>
 </head>
 <body>
 
