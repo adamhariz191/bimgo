@@ -728,44 +728,121 @@ function getGestureScore(sign, lm) {
         }
 
         // --- CHAPTER 2: LEVEL 5 (INTRODUCTIONS) ---
-       case "Saya":
-        case "I":
-        case "Me": { 
-            let score = 0;
+       case "Me":
+        case "Saya": {
+    let score = 0;
 
-            if (typeof landmarks !== "undefined" && landmarks.length > 20) {
-                let getDist = (p1, p2) => Math.hypot(p1.x - p2.x, p1.y - p2.y);
-                
-                // 1. Measure how far each fingertip is from the WRIST (Landmark 0)
-                // A pointing finger's tip is far from the wrist.
-                // A folded finger's tip is curled up right next to the wrist.
-                let idxDist = getDist(landmarks[8], landmarks[0]);
-                let midDist = getDist(landmarks[12], landmarks[0]);
-                let rngDist = getDist(landmarks[16], landmarks[0]);
-                let pnkDist = getDist(landmarks[20], landmarks[0]);
+    // HAND SHAPE: Only index finger extended, pointing forward
+    // Others curled, thumb tucked
+    if (idxUp) score += 25;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
 
-                // 2. The Final Check
-                // As long as your index finger is extended just 10% further from the wrist 
-                // than your folded fingers, it instantly gives you 100%.
-                if (idxDist > midDist * 1.1) score += 34;
-                if (idxDist > rngDist * 1.1) score += 33;
-                if (idxDist > pnkDist * 1.1) score += 33;
-            }
+    // Index finger should be pointing HORIZONTALLY (forward toward chest)
+    // Tip and PIP should be at similar Y level (horizontal, not pointing up)
+    // lm[8] = index tip, lm[6] = index PIP, lm[5] = index MCP
+    let indexHorizontal = Math.abs(lm[8].y - lm[6].y) < 0.06; // tip and PIP at same height
+    if (indexHorizontal) score += 15;
 
-            // Cleanly lock the score to 100 max
-            s = Math.min(100, score);
-            break;
+    // Thumb tucked alongside (not sticking up)
+    let thumbTucked = lm[4].y > lm[3].y;
+    if (thumbTucked) score += 5;
+
+    // Hand should be at chest level (not too high, not too low)
+    // wrist Y between 0.4 and 0.75 = chest area
+    if (lm[0].y > 0.40 && lm[0].y < 0.75) score += 10;
+
+    // STATIC HOLD: pointing gesture, no big movement needed
+    if (wristHistory.length > 8) {
+        if (metrics.totalDistance < 0.05) score += 10; // steady hold
+    }
+
+    s = score;
+    break;
+}
+
+        case "You":
+case "Awak":
+case "Kamu": {
+    let score = 0;
+
+    // HAND SHAPE: index finger pointing FORWARD toward screen
+    // Only index up, all others curled
+    if (idxUp) score += 25;
+    if (!midUp) score += 15;
+    if (!rngUp) score += 15;
+    if (!pnkUp) score += 15;
+
+    // Index pointing FORWARD (horizontal) not upward
+    // tip and PIP at similar Y = horizontal pointing toward camera
+    let tipY  = lm[8].y;
+    let pipY  = lm[6].y;
+    let mcpY  = lm[5].y;
+    let indexHorizontal = Math.abs(tipY - pipY) < 0.07;
+    if (indexHorizontal) score += 20;
+
+    // Thumb tucked (not sticking up)
+    let thumbTucked = lm[4].y > lm[3].y;
+    if (thumbTucked) score += 5;
+
+    // STATIC: pointing forward is a held gesture, minimal movement
+    if (wristHistory.length > 8) {
+        if (metrics.totalDistance < 0.06) score += 5;
+    }
+
+    s = score;
+    break;
+}
+
+case "Name":
+case "Nama": {
+    let score = 0;
+
+    // HAND SHAPE: index + middle fingers extended/relaxed
+    // Ring and pinky folded
+    if (idxUp) score += 20;
+    if (midUp) score += 20;
+    if (!rngUp) score += 10;
+    if (!pnkUp) score += 10;
+
+    // Both index and middle up together = confirmed shape
+    if (idxUp && midUp && !rngUp && !pnkUp) score += 10;
+
+    // Hand at chest level (both hands are near chest in the image)
+    if (lm[0].y > 0.35 && lm[0].y < 0.75) score += 10;
+
+    // MOVEMENT: one hand moves DOWN while other stays still
+    // Since best-score-wins tracks the moving hand,
+    // detect downward movement on Y axis
+    if (wristHistory.length > 10) {
+        let totalVert  = 0;
+        let totalHoriz = 0;
+        let vertDirChanges = 0;
+        let lastVertDir = null;
+
+        for (let i = 1; i < wristHistory.length; i++) {
+            const dx = wristHistory[i].x - wristHistory[i - 1].x;
+            const dy = wristHistory[i].y - wristHistory[i - 1].y;
+            totalVert  += Math.abs(dy);
+            totalHoriz += Math.abs(dx);
+
+            let vertDir = dy > 0.004 ? 'down' : dy < -0.004 ? 'up' : null;
+            if (vertDir && lastVertDir && vertDir !== lastVertDir) vertDirChanges++;
+            if (vertDir) lastVertDir = vertDir;
         }
 
-        case "Name": {
-            let score = 0;
-            if (idxUp && midUp && !rngUp && !pnkUp) score += 50;
-            if (score === 50 && wristHistory.length > 8) {
-                if (metrics.totalDistance > 0.02 || range.rangeY > 0.01) score += 50;
-            }
-            s = score;
-            break;
-        }
+        // Vertical must dominate (moving down, not sideways)
+        if (totalVert > totalHoriz * 1.2) score += 10;
+
+        // Downward movement detected
+        if (getVerticalDirection() === 'down') score += 10;
+        if (range.rangeY > 0.04) score += 10; // enough vertical range
+    }
+
+    s = score;
+    break;
+}
 
         // ========================================================
         // CHAPTER 3: DAILY LIFE ENGINE (ALIGNED WITH MOCK DATA)
