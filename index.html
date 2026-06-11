@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Bimgo</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Bimgo</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
 
-<link rel="stylesheet" href="css/style.css">
-
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -21,48 +20,90 @@
 
     <div id="notif" class="notification" style="display:none"></div>
 
-    <div id="s-splash" class="screen active" style="align-items:center;justify-content:center;"><div style="text-align:center; animation: popIn 0.8s ease;"><div style="font-size:80px;margin-bottom:8px">🤟</div><h1 style="font-size:56px;font-weight:900;color:#4CAF50;letter-spacing:-2px;margin-bottom:10px;">Bimgo</h1><p id="t-splash-sub" style="color:#a5d6a7;font-size:20px; font-weight:700;">Selamat datang ke Bimgo</p></div></div>
-    <div id="s-welcome-back" class="screen" style="align-items:center;justify-content:center; background:radial-gradient(circle at 50% 50%,#1b5e2033,#0a0f0a);"><div style="text-align:center; animation: popIn 0.5s ease;"><div style="font-size:72px;margin-bottom:16px;" id="wb-avatar">👤</div><h2 id="t-wb-title" style="font-size:32px; font-weight:900; color:#4CAF50; margin-bottom:8px;">Selamat kembali,</h2><h3 style="font-size:28px; font-weight:700; color:#fff;" id="wb-name">User</h3></div></div>
+    <div id="s-splash" class="screen active" style="align-items:center;justify-content:center;">
+        <div style="text-align:center; animation: popIn 0.8s ease;">
+            <div style="font-size:80px;margin-bottom:8px">🤟</div>
+            <h1 style="font-size:56px;font-weight:900;color:#4CAF50;letter-spacing:-2px;margin-bottom:10px;">Bimgo</h1>
+            <p id="t-splash-sub" style="color:#a5d6a7;font-size:20px; font-weight:700;">Selamat datang ke Bimgo</p>
+        </div>
+    </div>
+
+    <div id="s-welcome-back" class="screen" style="align-items:center;justify-content:center; background:radial-gradient(circle at 50% 50%,#1b5e2033,#0a0f0a);">
+        <div style="text-align:center; animation: popIn 0.5s ease;">
+            <div style="font-size:72px;margin-bottom:16px;" id="wb-avatar">👤</div>
+            <h2 id="t-wb-title" style="font-size:32px; font-weight:900; color:#4CAF50; margin-bottom:8px;">Selamat kembali,</h2>
+            <h3 style="font-size:28px; font-weight:700; color:#fff;" id="wb-name">User</h3>
+        </div>
+    </div>
     
     <div id="s-auth" class="screen" style="align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#1b5e2022,transparent 60%)">
-      <div style="width:100%;text-align:center;display:flex;flex-direction:column;gap:20px">
-        <div><div style="font-size:60px;margin-bottom:8px">🤟</div><h2 id="t-auth-title" style="font-size:32px;font-weight:900;color:#4CAF50;margin-bottom:6px">Selamat Datang</h2><p id="t-auth-sub" style="color:#6b7280;font-size:15px">Belajar Bahasa Isyarat Malaysia dengan AI.</p></div>
-        <div style="display:flex;flex-direction:column;gap:12px; margin-top:30px">
-          <button id="t-auth-google" class="btn btn-google" onclick="handleSocialAuth('google')">
-              <svg style="width:20px; height:20px; margin-right:8px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-              <span id="t-auth-g-text">Teruskan dengan Google</span>
-          </button>
-          <button id="t-auth-apple" class="btn btn-apple" onclick="handleSocialAuth('apple')">
-              <svg style="width:20px; height:20px; margin-right:8px;" fill="#fff" viewBox="0 0 24 24"><path d="M17.05 16.03c-.02-1.91 1.56-2.85 1.63-2.89-1.2-1.74-3.08-1.98-3.78-2.01-1.6-.16-3.13.94-3.95.94-.8 0-2.06-.92-3.37-.89-1.72.03-3.3 1-4.2 2.54-1.8 3.12-.46 7.73 1.3 10.28.87 1.25 1.88 2.65 3.2 2.59 1.27-.06 1.77-.84 3.32-.84 1.54 0 2.01.84 3.32.81 1.34-.03 2.22-1.28 3.08-2.52 1-1.47 1.4-2.89 1.43-2.96-.03-.01-2.65-1.02-2.68-4.05zm-2.61-6.19c.7-1.12 1.18-2.67.92-4.22-1.28.09-2.86.85-3.61 1.95-.67.96-1.22 2.53-1 4.05 1.45.1 2.97-.66 3.69-1.78z"/></svg>
-              <span id="t-auth-a-text">Teruskan dengan Apple</span>
-          </button>
-          <div class="auth-divider"><span id="t-auth-or">ATAU</span></div>
-          <button id="t-auth-email-btn" class="btn btn-primary" onclick="showScreen('s-email-hub')">✉️ Teruskan dengan E-mel</button>
+        <div style="width:100%;text-align:center;display:flex;flex-direction:column;gap:20px">
+            <div>
+                <div style="font-size:60px;margin-bottom:8px">🤟</div>
+                <h2 id="t-auth-title" style="font-size:32px;font-weight:900;color:#4CAF50;margin-bottom:6px">Selamat Datang</h2>
+                <p id="t-auth-sub" style="color:#6b7280;font-size:15px">Belajar Bahasa Isyarat Malaysia dengan AI.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px; margin-top:30px">
+                <button id="t-auth-google" class="btn btn-google" onclick="handleSocialAuth('google')">
+                    <svg style="width:20px; height:20px; margin-right:8px;" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    <span id="t-auth-g-text">Teruskan dengan Google</span>
+                </button>
+                <button id="t-auth-apple" class="btn btn-apple" onclick="handleSocialAuth('apple')">
+                    <svg style="width:20px; height:20px; margin-right:8px;" fill="#fff" viewBox="0 0 24 24"><path d="M17.05 16.03c-.02-1.91 1.56-2.85 1.63-2.89-1.2-1.74-3.08-1.98-3.78-2.01-1.6-.16-3.13.94-3.95.94-.8 0-2.06-.92-3.37-.89-1.72.03-3.3 1-4.2 2.54-1.8 3.12-.46 7.73 1.3 10.28.87 1.25 1.88 2.65 3.2 2.59 1.27-.06 1.77-.84 3.32-.84 1.54 0 2.01.84 3.32.81 1.34-.03 2.22-1.28 3.08-2.52 1-1.47 1.4-2.89 1.43-2.96-.03-.01-2.65-1.02-2.68-4.05zm-2.61-6.19c.7-1.12 1.18-2.67.92-4.22-1.28.09-2.86.85-3.61 1.95-.67.96-1.22 2.53-1 4.05 1.45.1 2.97-.66 3.69-1.78z"/></svg>
+                    <span id="t-auth-a-text">Teruskan dengan Apple</span>
+                </button>
+                <div class="auth-divider"><span id="t-auth-or">ATAU</span></div>
+                <button id="t-auth-email-btn" class="btn btn-primary" onclick="showScreen('s-email-hub')">✉️ Teruskan dengan E-mel</button>
+            </div>
         </div>
-      </div>
     </div>
 
     <div id="s-email-hub" class="screen" style="flex-direction:column;">
-        <div class="topbar" style="background:transparent; border:none; padding-bottom: 0;"><button onclick="showScreen('s-auth')" class="btn btn-ghost" style="width:48px;height:48px;padding:0;font-size:20px;border-radius:16px;">←</button></div>
+        <div class="topbar" style="background:transparent; border:none; padding-bottom: 0;">
+            <button onclick="showScreen('s-auth')" class="btn btn-ghost" style="width:48px;height:48px;padding:0;font-size:20px;border-radius:16px;">←</button>
+        </div>
         <div class="scroll-body" style="display:flex; flex-direction:column; justify-content:center; padding-top:10px;">
-            <div style="text-align:center; margin-bottom: 30px;"><h2 id="t-email-hub-title" style="font-size:32px;font-weight:900;margin-bottom:6px">Log Masuk E-mel</h2></div>
-            <div style="display:flex;flex-direction:column;gap:16px;"><button id="t-auth-reg" class="btn btn-primary" onclick="showScreen('s-signup')">🌟 Daftar Akaun Baru</button><button id="t-auth-log" class="btn btn-secondary" onclick="showScreen('s-login')">Log Masuk</button></div>
+            <div style="text-align:center; margin-bottom: 30px;">
+                <h2 id="t-email-hub-title" style="font-size:32px;font-weight:900;margin-bottom:6px">Log Masuk E-mel</h2>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+                <button id="t-auth-reg" class="btn btn-primary" onclick="showScreen('s-signup')">🌟 Daftar Akaun Baru</button>
+                <button id="t-auth-log" class="btn btn-secondary" onclick="showScreen('s-login')">Log Masuk</button>
+            </div>
         </div>
     </div>
 
     <div id="s-signup" class="screen" style="flex-direction:column;">
-        <div class="topbar" style="background:transparent; border:none; padding-bottom: 0;"><button onclick="showScreen('s-email-hub')" class="btn btn-ghost" style="width:48px;height:48px;padding:0;font-size:20px;border-radius:16px;">←</button></div>
+        <div class="topbar" style="background:transparent; border:none; padding-bottom: 0;">
+            <button onclick="showScreen('s-email-hub')" class="btn btn-ghost" style="width:48px;height:48px;padding:0;font-size:20px;border-radius:16px;">←</button>
+        </div>
         <div class="scroll-body" style="padding-top:10px;">
             <h2 id="t-reg-title" style="font-size:32px;font-weight:900;margin-bottom:24px">Daftar</h2>
-            <form onsubmit="handleSignup(event)"><label id="t-reg-lbl1">E-mel</label><input type="email" id="reg-email" required><label id="t-reg-lbl2">Kata Laluan</label><input type="password" id="reg-pass" required minlength="6"><label id="t-reg-lbl3">Sahkan Kata Laluan</label><input type="password" id="reg-pass2" required><button id="t-reg-btn" type="submit" class="btn btn-primary" style="margin-top:20px">Seterusnya →</button></form>
+            <form onsubmit="handleSignup(event)">
+                <label id="t-reg-lbl1">E-mel</label>
+                <input type="email" id="reg-email" required>
+                <label id="t-reg-lbl2">Kata Laluan</label>
+                <input type="password" id="reg-pass" required minlength="6">
+                <label id="t-reg-lbl3">Sahkan Kata Laluan</label>
+                <input type="password" id="reg-pass2" required>
+                <button id="t-reg-btn" type="submit" class="btn btn-primary" style="margin-top:20px">Seterusnya →</button>
+            </form>
         </div>
     </div>
 
     <div id="s-login" class="screen" style="flex-direction:column;">
-        <div class="topbar" style="background:transparent; border:none; padding-bottom: 0;"><button onclick="showScreen('s-email-hub')" class="btn btn-ghost" style="width:48px;height:48px;padding:0;font-size:20px;border-radius:16px;">←</button></div>
+        <div class="topbar" style="background:transparent; border:none; padding-bottom: 0;">
+            <button onclick="showScreen('s-email-hub')" class="btn btn-ghost" style="width:48px;height:48px;padding:0;font-size:20px;border-radius:16px;">←</button>
+        </div>
         <div class="scroll-body" style="padding-top:10px;">
             <h2 id="t-log-title" style="font-size:32px;font-weight:900;margin-bottom:24px">Log Masuk</h2>
-            <form onsubmit="handleLogin(event)"><label id="t-log-lbl1">E-mel</label><input type="email" id="login-email" required><label id="t-log-lbl2">Kata Laluan</label><input type="password" id="login-pass" required><button id="t-log-btn" type="submit" class="btn btn-primary" style="margin-top:20px">Log Masuk</button></form>
+            <form onsubmit="handleLogin(event)">
+                <label id="t-log-lbl1">E-mel</label>
+                <input type="email" id="login-email" required>
+                <label id="t-log-lbl2">Kata Laluan</label>
+                <input type="password" id="login-pass" required>
+                <button id="t-log-btn" type="submit" class="btn btn-primary" style="margin-top:20px">Log Masuk</button>
+            </form>
         </div>
     </div>
 
@@ -78,172 +119,203 @@
     </div>
 
     <div id="s-home" class="screen" style="flex-direction:column">
-      <div class="topbar"><div style="display:flex;align-items:center;gap:8px;flex:1"><span style="font-size:24px">🤟</span><span style="font-weight:900;font-size:20px;color:#4CAF50;letter-spacing:-0.5px">Bimgo</span></div><div style="display:flex;align-items:center;gap:8px"><div class="streak-pill"><span>🔥</span><span id="home-streak">1</span></div><div class="xp-pill"><span>⭐</span><span id="home-xp">0</span></div></div></div>
-      <div class="scroll-body has-bottom-nav">
-        <div style="display:flex;flex-direction:column;gap:20px">
-          <div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:24px;padding:24px;position:relative;overflow:hidden; box-shadow:0 10px 20px rgba(76, 175, 80, 0.1);"><p id="t-home-welcome" style="color:#a5d6a7;font-size:14px;margin-bottom:4px">Selamat datang,</p><h2 style="font-size:26px;font-weight:900;margin-bottom:16px" id="home-greeting">👤 Pengguna</h2><div class="flex-between"><span class="badge badge-green">🏛 MFD Rasmi</span><span class="badge badge-green">✅ BIM Bank</span></div></div>
-          <div class="card flex-between" style="gap:16px; border-radius:20px;"><div style="width:48px;height:48px;border-radius:16px;background:#0d47a122;border:1px solid #1976d244;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🎯</div><div style="flex:1"><p id="t-home-target" style="font-size:15px;font-weight:700;margin-bottom:6px">Sasaran Harian</p><div class="progress-bar"><div class="progress-fill" style="background:#42a5f5;width:40%"></div></div></div><span style="font-size:14px;color:#90caf9;font-weight:900" id="home-goal-label">4m</span></div>
-          <div class="flex-between" style="margin-top:8px"><h3 id="t-home-ch-title" style="font-size:18px;font-weight:900">Bab Pembelajaran</h3></div>
-          <div id="chapter-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:8px;flex:1">
+                <span style="font-size:24px">🤟</span>
+                <span style="font-weight:900;font-size:20px;color:#4CAF50;letter-spacing:-0.5px">Bimgo</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+                <div class="streak-pill"><span>🔥</span><span id="home-streak">1</span></div>
+                <div class="xp-pill"><span>⭐</span><span id="home-xp">0</span></div>
+            </div>
         </div>
-      </div>
+        <div class="scroll-body has-bottom-nav">
+            <div style="display:flex;flex-direction:column;gap:20px">
+                <div style="background:linear-gradient(135deg,#1b5e20,#2e7d32);border-radius:24px;padding:24px;position:relative;overflow:hidden; box-shadow:0 10px 20px rgba(76, 175, 80, 0.1);">
+                    <p id="t-home-welcome" style="color:#a5d6a7;font-size:14px;margin-bottom:4px">Selamat datang,</p>
+                    <h2 style="font-size:26px;font-weight:900;margin-bottom:16px" id="home-greeting">👤 Pengguna</h2>
+                    <div class="flex-between"><span class="badge badge-green">🏛 MFD Rasmi</span><span class="badge badge-green">✅ BIM Bank</span></div>
+                </div>
+                <div class="card flex-between" style="gap:16px; border-radius:20px;">
+                    <div style="width:48px;height:48px;border-radius:16px;background:#0d47a122;border:1px solid #1976d244;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🎯</div>
+                    <div style="flex:1;">
+                        <p id="t-home-target" style="font-size:15px;font-weight:700;margin-bottom:6px">Sasaran Harian</p>
+                        <div class="progress-bar"><div class="progress-fill" style="background:#42a5f5;width:40%"></div></div>
+                    </div>
+                    <span style="font-size:14px;color:#90caf9;font-weight:900" id="home-goal-label">4m</span>
+                </div>
+                <div class="flex-between" style="margin-top:8px"><h3 id="t-home-ch-title" style="font-size:18px;font-weight:900">Bab Pembelajaran</h3></div>
+                <div id="chapter-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px"></div>
+            </div>
+        </div>
     </div>
 
     <div id="s-chapter" class="screen" style="flex-direction:column">
-      <div class="topbar"><button onclick="showScreen('s-home')" class="btn btn-ghost" style="width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px;">←</button><span id="ch-icon" style="font-size:22px">🔤</span><div style="flex:1"><div style="font-weight:900;font-size:18px" id="ch-title">Abjad</div></div></div>
-      <div class="scroll-body has-bottom-nav"><div id="level-list"></div></div>
+        <div class="topbar">
+            <button onclick="showScreen('s-home')" class="btn btn-ghost" style="width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px;">←</button>
+            <span id="ch-icon" style="font-size:22px">🔤</span>
+            <div style="flex:1"><div style="font-weight:900;font-size:18px" id="ch-title">Abjad</div></div>
+        </div>
+        <div class="scroll-body has-bottom-nav"><div id="level-list"></div></div>
     </div>
 
     <div id="s-lesson" class="screen" style="flex-direction:column">
-      <div class="topbar">
-        <button onclick="showScreen('s-chapter')" class="btn btn-ghost" style="width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px;">←</button>
-        <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#a5d6a7" id="lesson-breadcrumb">Abjad · Level 1</div></div>
-        <div style="font-size:13px; font-weight:700; color:#fbbf24;" id="lesson-progress-text">1/5</div>
-      </div>
-      <div class="scroll-body">
-        <div id="lesson-body" style="display:flex;flex-direction:column;gap:16px">
-            <h2 id="t-les-theory" style="font-size:26px; font-weight:900; text-align:center; margin-top:10px;">Sesi Pembelajaran</h2>
-            <p id="t-les-watch" style="text-align:center; color:#9ca3af; font-size:15px; margin-bottom:10px;">Tonton demonstrasi di bawah.</p>
-            
-            <div class="gif-container">
-                <video id="lesson-vid" class="lesson-gif-img" autoplay loop muted playsinline style="display:none;"></video>
-                <img id="lesson-img" class="lesson-gif-img" style="display:none;" alt="Sign Language Image">
+        <div class="topbar">
+            <button onclick="showScreen('s-chapter')" class="btn btn-ghost" style="width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px;">←</button>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#a5d6a7" id="lesson-breadcrumb">Abjad · Level 1</div></div>
+            <div style="font-size:13px; font-weight:700; color:#fbbf24;" id="lesson-progress-text">1/5</div>
+        </div>
+        <div class="scroll-body">
+            <div id="lesson-body" style="display:flex;flex-direction:column;gap:16px">
+                <h2 id="t-les-theory" style="font-size:26px; font-weight:900; text-align:center; margin-top:10px;">Sesi Pembelajaran</h2>
+                <p id="t-les-watch" style="text-align:center; color:#9ca3af; font-size:15px; margin-bottom:10px;">Tonton demonstrasi di bawah.</p>
                 
-                <div style="margin-top: 16px;">
-                    <div style="font-weight:900; font-size:40px; color:#4CAF50;" id="vid-sign-name">A</div>
-                    <div id="t-les-visual" style="font-size:13px; color:#81c784; margin-top:4px;">Demonstrasi Visual</div>
+                <div class="gif-container">
+                    <video id="lesson-vid" class="lesson-gif-img" autoplay loop muted playsinline style="display:none;"></video>
+                    <img id="lesson-img" class="lesson-gif-img" style="display:none;" alt="Sign Language Image">
+                    
+                    <div style="margin-top: 16px;">
+                        <div style="font-weight:900; font-size:40px; color:#4CAF50;" id="vid-sign-name">A</div>
+                        <div id="t-les-visual" style="font-size:13px; color:#81c784; margin-top:4px;">Demonstrasi Visual</div>
+                    </div>
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+                    <a id="t-les-link" href="#" target="_blank" class="btn btn-secondary" style="text-align:center; text-decoration:none;">🔗 Semak di BIM Sign Bank</a>
+                    <button id="t-les-cam" class="btn btn-primary" onclick="openCameraChallenge()" style="font-size:18px; padding:18px;">Cuba Kamera AI 📷</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="s-quiz" class="screen" style="flex-direction:column">
+        <div class="topbar">
+            <button onclick="showScreen('s-chapter')" class="btn btn-ghost" style="width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px;">✕</button>
+            <div style="flex:1"><div style="font-size:15px;font-weight:900;color:#fff" id="t-quiz-title">Kuiz Kemahiran</div></div>
+            <div style="font-size:15px; font-weight:900; color:#fbbf24;" id="quiz-progress-text">1/8</div>
+        </div>
+        <div class="scroll-body" style="display:flex; flex-direction:column; align-items:center;">
+            <h3 id="t-quiz-q" style="font-size:20px;font-weight:900;margin-bottom:20px; text-align:center;">Pilih jawapan yang betul:</h3>
+            
+            <div class="gif-container" style="width: 100%;">
+                <img id="quiz-gif" class="lesson-gif-img" src="" alt="Soalan Kuiz">
+            </div>
+
+            <div class="quiz-grid" id="quiz-options" style="width: 100%;"></div>
+        </div>
+    </div>
+
+    <div id="s-camera" class="screen" style="flex-direction:column; background:#000;">
+        <div class="topbar" style="background:#000; border-bottom:1px solid #333;">
+            <button onclick="stopCam(); showScreen('s-lesson')" class="btn btn-ghost" style="width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px; border:none; background:#1f2937;">✕</button>
+            <span id="t-cam-title" style="font-weight:900; flex:1; text-align:center; padding-right:40px;">Cabaran AI</span>
+        </div>
+        <div class="scroll-body" style="padding:16px;">
+            <div style="display:flex;flex-direction:column;gap:20px;text-align:center; height:100%;">
+                <div><h3 style="font-size:22px;font-weight:900;margin-bottom:4px"><span id="t-cam-show">Tunjukkan:</span> <span id="cam-target-sign" style="color:#4CAF50; font-size:28px;">A</span></h3></div>
+                
+                <div class="hand-canvas-wrap">
+                    <video id="cam-video" class="video-bg" playsinline autoplay></video>
+                    <canvas id="hand-canvas" class="hand-canvas"></canvas>
+                    <div id="cam-status" style="position:absolute; bottom:0; left:0; width:100%; text-align:center; font-size:13px; font-weight:700; color:#fbbf24; background:rgba(0,0,0,0.7); padding:8px;">Memuatkan AI...</div>
+                </div>
+
+                <div id="movement-stats" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; background:#111c11; border:1px solid #1e3a1e; border-radius:12px; padding:12px; font-size:13px; text-align:left; color:#9ca3af;">
+                </div>
+
+                <div style="margin-top:auto;">
+                    <div class="flex-between" style="margin-bottom:8px"><span id="t-cam-acc" style="font-size:15px;color:#9ca3af;font-weight:700;">Ketepatan Semasa</span><span style="font-size:18px;font-weight:900" id="cam-acc-label">0%</span></div>
+                    <div class="progress-bar" style="height:14px; border-radius:7px;"><div class="progress-fill" id="cam-acc-bar" style="background:#F44336;width:0%; border-radius:7px;"></div></div>
+                </div>
+                <div id="cam-success-msg" style="display:none; border:2px solid #374151; border-radius:16px; padding:16px; font-size:15px; font-weight:900; margin-top:10px; transition:all 0.2s;">Sila tunjukkan tangan...</div>
+                <div style="display:flex;flex-direction:column;gap:12px; margin-top:10px;">
+                    <button class="btn btn-primary" id="cam-start-btn" onclick="startMediaPipeCam()" style="padding:18px; font-size:18px;">📷 Buka Kamera</button>
+                    <button class="btn btn-secondary" id="cam-submit-btn" onclick="submitCam()" style="display:none; padding:18px; font-size:18px; background:#1f2937; color:#fff; border:1px solid #374151;">Hantar Jawapan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="s-result" class="screen" style="align-items:center;justify-content:center;padding:24px; background:radial-gradient(circle at 50% 50%,#1b5e2033,#0a0f0a);">
+        <div style="width:100%;display:flex;flex-direction:column;gap:24px;text-align:center">
+            <div id="res-icon" style="font-size:100px;animation:popIn .6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🏆</div>
+            <div><h2 id="res-title" style="font-size:36px;font-weight:900;margin-bottom:12px; color:#4CAF50;">Tahniah!</h2><p id="res-sub" style="color:#a5d6a7;font-size:18px; font-weight:700;">Tanda betul!</p></div>
+            
+            <div id="res-stats-box" style="display:none; background:#111c11; border:1px solid #4CAF5044; border-radius:16px; padding:16px; margin-top:10px;">
+                <div class="flex-between">
+                    <div style="text-align:center; flex:1; border-right:1px solid #374151;">
+                        <div style="font-size:13px; color:#9ca3af; font-weight:700;">XP</div>
+                        <div style="font-size:24px; font-weight:900; color:#fbbf24;">+<span id="res-xp-val">0</span></div>
+                    </div>
+                    <div style="text-align:center; flex:1;">
+                        <div id="t-res-acc" style="font-size:13px; color:#9ca3af; font-weight:700;">Ketepatan Purata</div>
+                        <div style="font-size:24px; font-weight:900; color:#4CAF50;"><span id="res-acc-val">0</span>%</div>
+                    </div>
                 </div>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
-                <a id="t-les-link" href="#" target="_blank" class="btn btn-secondary" style="text-align:center; text-decoration:none;">🔗 Semak di BIM Sign Bank</a>
-                <button id="t-les-cam" class="btn btn-primary" onclick="openCameraChallenge()" style="font-size:18px; padding:18px;">Cuba Kamera AI 📷</button>
+                <button class="btn btn-primary" id="res-next-btn" onclick="nextLessonOrFinish()" style="padding:18px; font-size:18px;">Seterusnya →</button>
+                <button class="btn btn-ghost" id="res-retry-btn" onclick="openCameraChallenge()" style="display:none; padding:18px; font-size:18px;">Cuba Sekali Lagi</button>
             </div>
         </div>
-      </div>
-    </div>
-
-    <div id="s-quiz" class="screen" style="flex-direction:column">
-      <div class="topbar">
-        <button onclick="showScreen('s-chapter')" class="btn btn-ghost" style="width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px;">✕</button>
-        <div style="flex:1"><div style="font-size:15px;font-weight:900;color:#fff" id="t-quiz-title">Kuiz Kemahiran</div></div>
-        <div style="font-size:15px; font-weight:900; color:#fbbf24;" id="quiz-progress-text">1/8</div>
-      </div>
-      <div class="scroll-body" style="display:flex; flex-direction:column; align-items:center;">
-        <h3 id="t-quiz-q" style="font-size:20px;font-weight:900;margin-bottom:20px; text-align:center;">Pilih jawapan yang betul:</h3>
-        
-        <div class="gif-container" style="width: 100%;">
-            <img id="quiz-gif" class="lesson-gif-img" src="" alt="Soalan Kuiz">
-        </div>
-
-        <div class="quiz-grid" id="quiz-options" style="width: 100%;">
-            </div>
-      </div>
-    </div>
-
-    <div id="s-camera" class="screen" style="flex-direction:column; background:#000;">
-      <div class="topbar" style="background:#000; border-bottom:1px solid #333;"><button onclick="stopCam(); showScreen('s-lesson')" class="btn btn-ghost" style="width:40px;height:40px;padding:0;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:12px; border:none; background:#1f2937;">✕</button><span id="t-cam-title" style="font-weight:900; flex:1; text-align:center; padding-right:40px;">Cabaran AI</span></div>
-      <div class="scroll-body" style="padding:16px;">
-        <div style="display:flex;flex-direction:column;gap:20px;text-align:center; height:100%;">
-          <div><h3 style="font-size:22px;font-weight:900;margin-bottom:4px"><span id="t-cam-show">Tunjukkan:</span> <span id="cam-target-sign" style="color:#4CAF50; font-size:28px;">A</span></h3></div>
-          <div class="hand-canvas-wrap">
-            <video id="cam-video" class="video-bg" playsinline autoplay></video>
-            <canvas id="hand-canvas" class="hand-canvas"></canvas>
-            <div id="cam-status" style="position:absolute; bottom:0; left:0; width:100%; text-align:center; font-size:13px; font-weight:700; color:#fbbf24; background:rgba(0,0,0,0.7); padding:8px;">Memuatkan AI...</div>
-          </div>
-          <div style="margin-top:auto;">
-            <div class="flex-between" style="margin-bottom:8px"><span id="t-cam-acc" style="font-size:15px;color:#9ca3af;font-weight:700;">Ketepatan Semasa</span><span style="font-size:18px;font-weight:900" id="cam-acc-label">0%</span></div>
-            <div class="progress-bar" style="height:14px; border-radius:7px;"><div class="progress-fill" id="cam-acc-bar" style="background:#F44336;width:0%; border-radius:7px;"></div></div>
-          </div>
-          <div id="cam-success-msg" style="display:none; border:2px solid #374151; border-radius:16px; padding:16px; font-size:15px; font-weight:900; margin-top:10px; transition:all 0.2s;">Sila tunjukkan tangan...</div>
-          <div style="display:flex;flex-direction:column;gap:12px; margin-top:10px;">
-            <button class="btn btn-primary" id="cam-start-btn" onclick="startMediaPipeCam()" style="padding:18px; font-size:18px;">📷 Buka Kamera</button>
-            <button class="btn btn-secondary" id="cam-submit-btn" onclick="submitCam()" style="display:none; padding:18px; font-size:18px; background:#1f2937; color:#fff; border:1px solid #374151;">Hantar Jawapan</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="s-result" class="screen" style="align-items:center;justify-content:center;padding:24px; background:radial-gradient(circle at 50% 50%,#1b5e2033,#0a0f0a);">
-      <div style="width:100%;display:flex;flex-direction:column;gap:24px;text-align:center">
-        <div id="res-icon" style="font-size:100px;animation:popIn .6s cubic-bezier(0.175, 0.885, 0.32, 1.275);">🏆</div>
-        <div><h2 id="res-title" style="font-size:36px;font-weight:900;margin-bottom:12px; color:#4CAF50;">Tahniah!</h2><p id="res-sub" style="color:#a5d6a7;font-size:18px; font-weight:700;">Tanda betul!</p></div>
-        
-        <div id="res-stats-box" style="display:none; background:#111c11; border:1px solid #4CAF5044; border-radius:16px; padding:16px; margin-top:10px;">
-            <div class="flex-between">
-                <div style="text-align:center; flex:1; border-right:1px solid #374151;">
-                    <div style="font-size:13px; color:#9ca3af; font-weight:700;">XP</div>
-                    <div style="font-size:24px; font-weight:900; color:#fbbf24;">+<span id="res-xp-val">0</span></div>
-                </div>
-                <div style="text-align:center; flex:1;">
-                    <div id="t-res-acc" style="font-size:13px; color:#9ca3af; font-weight:700;">Ketepatan Purata</div>
-                    <div style="font-size:24px; font-weight:900; color:#4CAF50;"><span id="res-acc-val">0</span>%</div>
-                </div>
-            </div>
-        </div>
-
-        <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
-            <button class="btn btn-primary" id="res-next-btn" onclick="nextLessonOrFinish()" style="padding:18px; font-size:18px;">Seterusnya →</button>
-            <button class="btn btn-ghost" id="res-retry-btn" onclick="openCameraChallenge()" style="display:none; padding:18px; font-size:18px;">Cuba Sekali Lagi</button>
-        </div>
-      </div>
     </div>
 
     <div id="s-profile" class="screen" style="flex-direction:column">
-      <div class="topbar"><span id="t-prof-title" style="font-size:24px; font-weight:900; width:100%; text-align:center;">Profil Saya</span></div>
-      <div class="scroll-body has-bottom-nav">
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div style="background:#111c11; border:1px solid #1e3a1e; border-radius:24px; padding:30px 20px; text-align:center">
-            <div style="font-size:64px;margin-bottom:12px" id="prof-avatar">🦁</div>
-            <div style="font-size:24px;font-weight:900;margin-bottom:6px" id="prof-name">Pengguna</div>
-            <div style="color:#a5d6a7;font-size:15px; font-weight:700; margin-bottom:16px;" id="prof-sub">0 XP · 1 🔥 hari</div>
-            <button id="t-prof-edit-btn" class="btn btn-secondary" onclick="openEditProfile()" style="margin:0 auto; padding:10px 20px; font-size:14px; width:auto; border-radius:12px;">✏️ Sunting Profil</button>
-          </div>
-          <div class="tab-bar" id="prof-tabs" style="margin-top:10px;">
-            <button id="t-tab-stat" class="tab active" onclick="setProfileTab('stats')">📊 Statistik</button>
-            <button id="t-tab-badge" class="tab" onclick="setProfileTab('badges')">🏅 Lencana</button>
-            <button id="t-tab-rank" class="tab" onclick="setProfileTab('leaders')">🏆 Ranking</button>
-          </div>
-          <div id="prof-content" style="min-height:200px;"></div>
-          <button id="t-prof-logout" class="btn btn-danger" onclick="logoutApp()" style="margin-top:30px; padding:16px; font-size:16px;">Log Keluar</button>
+        <div class="topbar"><span id="t-prof-title" style="font-size:24px; font-weight:900; width:100%; text-align:center;">Profil Saya</span></div>
+        <div class="scroll-body has-bottom-nav">
+            <div style="display:flex;flex-direction:column;gap:16px">
+                <div style="background:#111c11; border:1px solid #1e3a1e; border-radius:24px; padding:30px 20px; text-align:center">
+                    <div style="font-size:64px;margin-bottom:12px" id="prof-avatar">🦁</div>
+                    <div style="font-size:24px;font-weight:900;margin-bottom:6px" id="prof-name">Pengguna</div>
+                    <div style="color:#a5d6a7;font-size:15px; font-weight:700; margin-bottom:16px;" id="prof-sub">0 XP · 1 🔥 hari</div>
+                    <button id="t-prof-edit-btn" class="btn btn-secondary" onclick="openEditProfile()" style="margin:0 auto; padding:10px 20px; font-size:14px; width:auto; border-radius:12px;">✏️ Sunting Profil</button>
+                </div>
+                <div class="tab-bar" id="prof-tabs" style="margin-top:10px;">
+                    <button id="t-tab-stat" class="tab active" onclick="setProfileTab('stats')">📊 Statistik</button>
+                    <button id="t-tab-badge" class="tab" onclick="setProfileTab('badges')">🏅 Lencana</button>
+                    <button id="t-tab-rank" class="tab" onclick="setProfileTab('leaders')">🏆 Ranking</button>
+                </div>
+                <div id="prof-content" style="min-height:200px;"></div>
+                <button id="t-prof-logout" class="btn btn-danger" onclick="logoutApp()" style="margin-top:30px; padding:16px; font-size:16px;">Log Keluar</button>
+            </div>
         </div>
-      </div>
     </div>
 
     <div id="s-edit-profile" class="screen" style="flex-direction:column;">
-      <div class="topbar" style="background:transparent; border:none; padding-bottom: 0;">
-        <button onclick="showScreen('s-profile')" class="btn btn-ghost" style="width:48px;height:48px;padding:0;font-size:20px;border-radius:16px;">←</button>
-      </div>
-      <div class="scroll-body" style="padding-top:10px;">
-          <h2 id="t-edit-title" style="font-size:32px;font-weight:900;margin-bottom:24px">Sunting Profil</h2>
-          <div style="display:flex;flex-direction:column;gap:24px">
-            <div>
-              <label id="t-edit-lbl1">Nama Pengguna</label>
-              <input type="text" id="edit-username" placeholder="Nama Baru...">
+        <div class="topbar" style="background:transparent; border:none; padding-bottom: 0;">
+            <button onclick="showScreen('s-profile')" class="btn btn-ghost" style="width:48px;height:48px;padding:0;font-size:20px;border-radius:16px;">←</button>
+        </div>
+        <div class="scroll-body" style="padding-top:10px;">
+            <h2 id="t-edit-title" style="font-size:32px;font-weight:900;margin-bottom:24px">Sunting Profil</h2>
+            <div style="display:flex;flex-direction:column;gap:24px">
+                <div>
+                    <label id="t-edit-lbl1">Nama Pengguna</label>
+                    <input type="text" id="edit-username" placeholder="Nama Baru...">
+                </div>
+                <div>
+                    <label id="t-edit-lbl2">Pilih Avatar Baru</label>
+                    <div class="avatar-grid" id="edit-avatar-grid"></div>
+                </div>
+                <div>
+                    <label id="t-edit-lbl3">Pilih Bahasa</label>
+                    <div style="display:flex;gap:10px; margin-top:8px;">
+                        <button class="btn btn-secondary" id="lang-btn-ms" onclick="editTempLang='ms'; renderLangButtons();" style="flex:1;">Bahasa Melayu</button>
+                        <button class="btn btn-secondary" id="lang-btn-en" onclick="editTempLang='en'; renderLangButtons();" style="flex:1;">English</button>
+                    </div>
+                </div>
+                <button id="t-edit-btn" class="btn btn-primary" onclick="saveProfile()" style="margin-top:20px; padding:18px; font-size:18px;">Simpan Perubahan ✅</button>
             </div>
-            <div>
-              <label id="t-edit-lbl2">Pilih Avatar Baru</label>
-              <div class="avatar-grid" id="edit-avatar-grid"></div>
-            </div>
-            <div>
-              <label id="t-edit-lbl3">Pilih Bahasa</label>
-              <div style="display:flex;gap:10px; margin-top:8px;">
-                  <button class="btn btn-secondary" id="lang-btn-ms" onclick="editTempLang='ms'; renderLangButtons();" style="flex:1;">Bahasa Melayu</button>
-                  <button class="btn btn-secondary" id="lang-btn-en" onclick="editTempLang='en'; renderLangButtons();" style="flex:1;">English</button>
-              </div>
-            </div>
-            <button id="t-edit-btn" class="btn btn-primary" onclick="saveProfile()" style="margin-top:20px; padding:18px; font-size:18px;">Simpan Perubahan ✅</button>
-          </div>
-      </div>
+        </div>
     </div>
 
     <nav class="bottom-nav" id="main-nav" style="display:none;">
-      <button class="nav-item active" id="nav-home" onclick="showScreen('s-home')">
-        <span class="nav-icon">🏠</span><span id="t-nav-home" class="nav-text">Utama</span>
-      </button>
-      <button class="nav-item" id="nav-profile" onclick="showScreen('s-profile')">
-        <span class="nav-icon">👤</span><span id="t-nav-prof" class="nav-text">Profil</span>
-      </button>
+        <button class="nav-item active" id="nav-home" onclick="showScreen('s-home')">
+            <span class="nav-icon">🏠</span><span id="t-nav-home" class="nav-text">Utama</span>
+        </button>
+        <button class="nav-item" id="nav-profile" onclick="showScreen('s-profile')">
+            <span class="nav-icon">👤</span><span id="t-nav-prof" class="nav-text">Profil</span>
+        </button>
     </nav>
 </div> 
 

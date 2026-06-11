@@ -40,6 +40,7 @@ const i18n = {
     edit_title: "Edit Profile", edit_lbl1: "Username", edit_lbl2: "Choose New Avatar", edit_lbl3: "Select Language", edit_save: "Save Changes ✅",
     ch1: "Alphabet", ch2: "Greetings", ch3: "Daily Life", ch4: "Emergency",
     les_theory: "Learning Session", les_watch: "Watch the demonstration below.", les_visual: "Visual Demonstration", les_link: "Check BIM Sign Bank", les_cam: "Try AI Camera 📷",
+    nav_item: "none",
     cam_title: "AI Challenge", cam_show: "Show:", cam_acc: "Current Accuracy", cam_open: "📷 Open Camera", cam_submit: "Submit Answer", cam_ready: "Please show your hand...", cam_load: "Loading AI...",
     cam_correct: "✅ Accurate Shape! You can submit.", cam_wrong: "❌ Inaccurate Shape. Fix your position.", res_congrats: "Congratulations!", res_correct: "Sign successfully recorded.", res_lvldone: "Level complete. +XP Added!",
     res_next: "Continue Learning →", res_home: "Back to Home", res_tryagain: "Try Again!", res_below: "Accuracy below 85%. Keep practicing!", res_retrybtn: "Try One More Time",
@@ -78,7 +79,7 @@ const CHAPTERS = [
     id: 2, dictKey: "ch2", subtitle: "Greetings", icon: "👋", color: "#2196F3",
     levels: [
       { id: "2-1", dictKey: "lvl_quick_greet", signs: ["Hello", "Goodbye", "Friend"], xp: 500 },
-      { id: "2-2", dictKey: "lvl_polite", signs: ["Please", "Thank you", "You're Welcome"], xp: 500 },
+      { id: "2-2", dictKey: "lvl_polite", signs: ["Please", "Thank you", "You're Welcome", "Sorry"], xp: 500 },
       { id: "2-3", dictKey: "lvl_basic_ans", signs: ["Yes", "No", "Understand"], xp: 500 },
       { id: "2-4", dictKey: "lvl_time_day", signs: ["Good Morning", "Good Night", "How are you?"], xp: 500 },
       { id: "2-5", dictKey: "lvl_intro", signs: ["Me", "You", "Name"], xp: 500 },
@@ -92,14 +93,14 @@ const CHAPTERS = [
       { id: "3-2", dictKey: "lvl_core_fam", signs: ["Mother", "Father"], xp: 500 },
       { id: "3-3", dictKey: "lvl_time_act", signs: ["Tomorrow", "Need", "Go"], xp: 500 },
       { id: "3-4", dictKey: "lvl_ext_fam", signs: ["Brother", "Sister"], xp: 500 },
-      { id: "3-5", dictKey: "lvl_pres_act", signs: ["Work", "School","Now"], xp: 500 },
+      { id: "3-5", dictKey: "lvl_pres_act", signs: ["Work", "School", "Now"], xp: 500 },
       { id: "3-q", dictKey: "lvl_quiz", isQuiz: true, xp: 1000 }
     ]
   },
   {
     id: 4, dictKey: "ch4", subtitle: "Emergency", icon: "🆘", color: "#F44336",
     levels: [
-      { id: "4-1", dictKey: "lvl_first_resp", signs: ["Help","Medicine", "Dizzy"], xp: 500 },
+      { id: "4-1", dictKey: "lvl_first_resp", signs: ["Help", "Medicine", "Dizzy"], xp: 500 },
       { id: "4-2", dictKey: "lvl_imm_alert", signs: ["Danger", "Stop"], xp: 500 },
       { id: "4-3", dictKey: "lvl_med_haz", signs: ["Doctor", "Hospital", "Nurse"], xp: 500 },
       { id: "4-4", dictKey: "lvl_sec_safe", signs: ["Police", "Thief", "Fire"], xp: 500 },
@@ -209,3 +210,13 @@ let learningInterval = null;
 function gs(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
 function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
 function t(key) { const l = profile ? (profile.lang || 'ms') : setupData.lang; return i18n[l][key] || key; }
+
+// Pembetulan fungsi Smart Link Bank Isyarat BIM (Sokongan Abjad + Perkataan Harian)
+function signBankUrl(sign){ 
+  const s = sign.toLowerCase().replace(/\s+/g,"-"); 
+  if (s.length === 1) {
+      return `https://www.bimsignbank.org/alphabets/${s}`; 
+  } else {
+      return `https://www.bimsignbank.org/dictionary/search/${encodeURIComponent(s)}`;
+  }
+}
