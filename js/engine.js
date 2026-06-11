@@ -872,25 +872,65 @@ case "Nama": {
             break;
         }
 
-        case "Mother": {
-            let score = 0;
-            if (idxUp && midUp && rngUp) score += 45; 
-            if (wristHistory.length > 10) {
-                if (getVerticalDirection() === 'down' && range.rangeY > 0.04) score += 55; 
-            }
-            s = score;
-            break;
-        }
+        case "Mother":
+case "Ibu": {
+    let score = 0;
 
-        case "Father": {
-            let score = 0;
-            if (idxUp && midUp && rngUp) score += 45; 
-            if (wristHistory.length > 10) {
-                if (getVerticalDirection() === 'up' && range.rangeY > 0.04) score += 55; 
-            }
-            s = score;
-            break;
-        }
+    // HAND SHAPE: all 4 fingers extended up, flat open hand
+    if (idxUp) score += 15;
+    if (midUp) score += 15;
+    if (rngUp) score += 15;
+    if (pnkUp) score += 15;
+
+    // All 4 up together = confirmed flat open hand
+    if (idxUp && midUp && rngUp && pnkUp) score += 10;
+
+    // POSITION: hand at CHIN level (lower face area)
+    // wrist Y between 0.55 and 0.80 = chin/mouth area
+    if (lm[0].y > 0.55 && lm[0].y < 0.80) score += 20;
+
+    // Fingertips should be clearly above wrist (fingers pointing up)
+    let tipsAboveWrist = lm[8].y < lm[0].y && lm[12].y < lm[0].y;
+    if (tipsAboveWrist) score += 10;
+
+    // STATIC: held position, minimal movement
+    if (wristHistory.length > 8) {
+        if (metrics.totalDistance < 0.05) score += 10;
+    }
+
+    s = score;
+    break;
+}
+
+case "Father":
+case "Ayah": {
+    let score = 0;
+
+    // HAND SHAPE: all 4 fingers extended up, flat open hand
+    if (idxUp) score += 15;
+    if (midUp) score += 15;
+    if (rngUp) score += 15;
+    if (pnkUp) score += 15;
+
+    // All 4 up together = confirmed flat open hand
+    if (idxUp && midUp && rngUp && pnkUp) score += 10;
+
+    // POSITION: hand at FOREHEAD level (upper face area)
+    // wrist Y below 0.45 = forehead/top of head area
+    if (lm[0].y < 0.45) score += 20;
+
+    // Fingertips should be clearly above wrist (fingers pointing up)
+    let tipsAboveWrist = lm[8].y < lm[0].y && lm[12].y < lm[0].y;
+    if (tipsAboveWrist) score += 10;
+
+    // STATIC: held position, minimal movement
+    if (wristHistory.length > 8) {
+        if (metrics.totalDistance < 0.05) score += 10;
+    }
+
+    s = score;
+    break;
+}
 
         case "Tomorrow": {
             let score = 0;

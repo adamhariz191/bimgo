@@ -300,20 +300,38 @@ function startLevel(li){
 function startQuiz() {
     quizScore = 0; 
     currentQuizIdx = 0; 
+
+    // Collect all signs from this chapter
     let allChapterSigns = [];
     currentChapter.levels.forEach(l => { if (!l.isQuiz) allChapterSigns.push(...l.signs); });
+
+    // Remove duplicates in sign pool
+    allChapterSigns = [...new Set(allChapterSigns)];
+
+    // Shuffle the full sign pool
+    let shuffled = allChapterSigns.sort(() => Math.random() - 0.5);
+
+    // Pick up to 10 UNIQUE correct answers (no repeats)
+    let correctSigns = shuffled.slice(0, Math.min(10, shuffled.length));
+
     quizQuestions = [];
-    
-    for(let i = 0; i < 10; i++) {
-        let correctSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)]; 
-        let options = [correctSign];
-        while(options.length < 4) { 
-            let wrongSign = allChapterSigns[Math.floor(Math.random() * allChapterSigns.length)]; 
-            if(!options.includes(wrongSign)) options.push(wrongSign); 
-        }
-        options.sort(() => Math.random() - 0.5); 
+
+    for (let i = 0; i < correctSigns.length; i++) {
+        let correctSign = correctSigns[i];
+
+        // Build wrong options pool: everything except the correct sign
+        let wrongPool = allChapterSigns.filter(s => s !== correctSign);
+
+        // Shuffle wrong pool and pick 3 unique wrong answers
+        wrongPool = wrongPool.sort(() => Math.random() - 0.5);
+        let options = [correctSign, ...wrongPool.slice(0, 3)];
+
+        // Shuffle the final options so correct answer isn't always first
+        options = options.sort(() => Math.random() - 0.5);
+
         quizQuestions.push({ correct: correctSign, options: options });
     }
+
     renderQuizQuestion(); 
     showScreen('s-quiz');
 }
@@ -333,17 +351,26 @@ function renderQuizQuestion() {
     }
 
     let feedback = document.getElementById('quiz-feedback');
-    if(!feedback) {
+    if (!feedback) {
         feedback = document.createElement('div');
         feedback.id = 'quiz-feedback';
         feedback.style.cssText = 'text-align:center; font-weight:900; margin-top:20px; font-size:18px; min-height:28px; transition: 0.3s;';
         document.getElementById('quiz-options').after(feedback);
     }
-    feedback.textContent = ""; 
+    feedback.textContent = "";
 
     let grid = document.getElementById('quiz-options');
-    grid.innerHTML = q.options.map(opt => `<button class="quiz-btn" onclick="handleQuizAnswer(this, '${opt}', '${q.correct}')">${t("sign_" + opt)}</button>`).join('');
-}
+    grid.innerHTML = '';
+    q.options.forEach((opt) => {
+        let btn = document.createElement('button');
+        btn.className = 'quiz-btn';
+        btn.textContent = t("sign_" + opt);
+        btn.addEventListener('click', function() {
+            handleQuizAnswer(btn, opt, q.correct);
+        });
+        grid.appendChild(btn);
+    });
+} // <-- this closing brace was missing
 
 function handleQuizAnswer(btn, selected, correct) {
     document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
