@@ -767,7 +767,7 @@ function getGestureScore(sign, lm) {
     break;
 }
 
-        case "You":
+case "You":
 case "Awak":
 case "Kamu": {
     let score = 0;
